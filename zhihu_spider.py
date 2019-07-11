@@ -1,7 +1,7 @@
 import re
 import asyncio
 from zhihu_client import ZhihuClient
-from termcolor import cprint
+from utils import print_colour
 
 
 class ZhihuSpider(object):
@@ -23,7 +23,7 @@ class ZhihuSpider(object):
 
         async with self.client.get(url) as resp:
             result = await resp.json()
-            cprint(result)
+            print_colour(result)
 
         output = {
             'name': result['name'],
@@ -33,7 +33,7 @@ class ZhihuSpider(object):
             'vip_info': result['vip_info'],
             'url': result['url'],
         }
-        cprint(output)
+        print_colour(output)
         return output
 
     async def get_recommend_article(self):
@@ -105,14 +105,14 @@ class ZhihuSpider(object):
                 }
                 article_info.update(question)
             output.append(article_info)
-        cprint(output)
+        print_colour(output)
         return output
 
 
 if __name__ == '__main__':
-
+    from setting import USER, PASSWORD
     async def test():
-        client = ZhihuClient(user='', password='')
+        client = ZhihuClient(user=USER, password=PASSWORD)
         await client.login(load_cookies=True)
         spider = ZhihuSpider(client)
         await spider.get_recommend_article()

@@ -6,13 +6,14 @@ import hmac
 import hashlib
 import json
 import re
+import os
 import sys
 import time
 import threading
 from typing import Union
 from PIL import Image
 from urllib.parse import urlencode
-from termcolor import cprint
+from utils import print_colour
 from log import get_logger
 from setting import COOKIE_FILE
 
@@ -40,11 +41,12 @@ class ZhihuClient(aiohttp.ClientSession):
             is_succ = await self.check_login()
             self.logger.debug(f'加载cookies从:{self.cookie_file}')
             if is_succ:
-                cprint('登录成功!', color='green')
+                print_colour('登录成功!', colour='green')
                 return
             else:
-                cprint('通过缓存登录失败尝试重新登录', 'red')
+                print_colour('通过缓存登录失败尝试重新登录', 'red')
                 self.cookie_jar.clear()
+                os.remove(self.cookie_file)
 
         login_data = {
             'client_id': 'c3cef7c66a1843f8b3a9e6a1e3160e20',
@@ -79,12 +81,12 @@ class ZhihuClient(aiohttp.ClientSession):
         async with self.post(url, data=data, headers=headers) as r:
             resp = await r.text()
             if 'error' in resp:
-                cprint(json.loads(resp)['error'], 'red')
+                print_colour(json.loads(resp)['error'], 'red')
                 self.logger.debug(f"登录失败:{json.loads(resp)['error']}")
             self.logger.debug(resp)
             is_succ = await self.check_login()
             if is_succ:
-                cprint('登录成功!', color='green')
+                print_colour('登录成功!', colour='green')
 
     async def _get_captcha(self) -> str:
         """
@@ -170,11 +172,11 @@ class ZhihuClient(aiohttp.ClientSession):
             return js.call('Q', urlencode(form_data))
 
 
-
 if __name__ == '__main__':
+    from setting import USER, PASSWORD
     async def test():
         global client
-        client = ZhihuClient(user='13335256039', password='wangfan123')
+        client = ZhihuClient(user=USER, password=PASSWORD)
         await client.login(load_cookies=True)
         
     ioloop = asyncio.get_event_loop()
