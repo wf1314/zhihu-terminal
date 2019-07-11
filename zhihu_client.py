@@ -170,7 +170,7 @@ class ZhihuClient(aiohttp.ClientSession):
 
 
 async def run():
-    async with ZhihuClient(user='13335256039', password='wangfan123') as client:
+    async with ZhihuClient(user='1333*******', password='********') as client:
         await client.login(load_cookies=False)
 
 
