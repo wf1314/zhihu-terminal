@@ -12,9 +12,9 @@ import threading
 from typing import Union
 from PIL import Image
 from urllib.parse import urlencode
+from termcolor import cprint
 from log import get_logger
 from setting import COOKIE_FILE
-from utils import print_colour
 
 
 class ZhihuClient(aiohttp.ClientSession):
@@ -40,10 +40,10 @@ class ZhihuClient(aiohttp.ClientSession):
             is_succ = await self.check_login()
             self.logger.debug(f'加载cookies从:{self.cookie_file}')
             if is_succ:
-                print_colour('登录成功!')
+                cprint('登录成功!', color='green')
                 return
             else:
-                print_colour('通过缓存登录失败尝试重新登录', 'red')
+                cprint('通过缓存登录失败尝试重新登录', 'red')
                 self.cookie_jar.clear()
 
         login_data = {
@@ -52,7 +52,7 @@ class ZhihuClient(aiohttp.ClientSession):
             'source': 'com.zhihu.web',
             'username': self.user,
             'password': self.password,
-            'lang': 'en',
+            'lang': 'en',  # en 4位验证码, cn 中文验证码
             'ref_source': 'homepage',
             'utm_source': ''
         }
@@ -79,11 +79,12 @@ class ZhihuClient(aiohttp.ClientSession):
         async with self.post(url, data=data, headers=headers) as r:
             resp = await r.text()
             if 'error' in resp:
-                print_colour(json.loads(resp)['error'], 'red')
+                cprint(json.loads(resp)['error'], 'red')
                 self.logger.debug(f"登录失败:{json.loads(resp)['error']}")
+            self.logger.debug(resp)
             is_succ = await self.check_login()
             if is_succ:
-                print_colour('登录成功!')
+                cprint('登录成功!', color='green')
 
     async def _get_captcha(self) -> str:
         """
@@ -169,10 +170,12 @@ class ZhihuClient(aiohttp.ClientSession):
             return js.call('Q', urlencode(form_data))
 
 
-async def run():
-    async with ZhihuClient(user='13335256039', password='wangfan123') as client:
-        await client.login(load_cookies=False)
-
-
 if __name__ == '__main__':
-    asyncio.get_event_loop().run_until_complete(run())
+    async def test():
+        global client
+        client = ZhihuClient(user='13335256039', password='wangfan123')
+        await client.login(load_cookies=True)
+
+
+    ioloop = asyncio.get_event_loop()
+    ioloop.run_until_complete(test())
