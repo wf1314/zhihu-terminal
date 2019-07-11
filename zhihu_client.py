@@ -83,6 +83,7 @@ class ZhihuClient(aiohttp.ClientSession):
             if 'error' in resp:
                 print_colour(json.loads(resp)['error'], 'red')
                 self.logger.debug(f"登录失败:{json.loads(resp)['error']}")
+                sys.exit()
             self.logger.debug(resp)
             is_succ = await self.check_login()
             if is_succ:

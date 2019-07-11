@@ -7,6 +7,7 @@ from setting import PASSWORD
 from utils import print_colour
 
 
+
 def start():
     print('************************************')
     print('')
@@ -16,25 +17,35 @@ def welcome():
     pass
 
 
+def check_setting():
+    pass
+
+
 async def login(user, password):
+    """
+    登录
+    :param user:
+    :param password:
+    :return:
+    """
     client = ZhihuClient(user, password)
     load_cookies = False
     if os.path.exists(client.cookie_file):
+        # 如果cookie缓存存在优先读取缓存
         load_cookies = True
-    if not load_cookies:
-        assert USER and PASSWORD, '未配置账号密码'
     await client.login(load_cookies=load_cookies)
     return client
 
 
 async def _run():
+    client = await login(USER, PASSWORD)
     try:
-        client = await login(USER, PASSWORD)
+        check_setting()
         spider = ZhihuSpider(client)
         await spider.get_me_info()
         await spider.get_recommend_article()
-    except:
-        pass
+    except Exception as e:
+        print_colour(e, colour='red')
     finally:
         await client.close()
 
