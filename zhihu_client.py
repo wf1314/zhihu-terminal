@@ -170,12 +170,12 @@ class ZhihuClient(aiohttp.ClientSession):
             return js.call('Q', urlencode(form_data))
 
 
+
 if __name__ == '__main__':
     async def test():
         global client
         client = ZhihuClient(user='13335256039', password='wangfan123')
         await client.login(load_cookies=True)
-
-
+        
     ioloop = asyncio.get_event_loop()
     ioloop.run_until_complete(test())
