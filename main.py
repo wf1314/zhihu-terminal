@@ -7,7 +7,6 @@ from setting import PASSWORD
 from utils import print_colour
 
 
-
 def start():
     print('************************************')
     print('')
@@ -42,12 +41,14 @@ async def _run():
     try:
         check_setting()
         spider = ZhihuSpider(client)
-        await spider.get_me_info()
+        await spider.get_self_info()
         await spider.get_recommend_article()
     except Exception as e:
         print_colour(e, colour='red')
     finally:
+        await asyncio.sleep(0)
         await client.close()
+
 
 def main():
     ioloop = asyncio.get_event_loop()

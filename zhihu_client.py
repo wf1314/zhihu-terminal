@@ -38,8 +38,8 @@ class ZhihuClient(aiohttp.ClientSession):
     async def login(self, load_cookies: bool=False) -> None:
         if load_cookies:
             self.cookie_jar.load(self.cookie_file)
-            is_succ = await self.check_login()
             self.logger.debug(f'加载cookies从:{self.cookie_file}')
+            is_succ = await self.check_login()
             if is_succ:
                 print_colour('登录成功!', colour='green')
                 return
@@ -148,7 +148,7 @@ class ZhihuClient(aiohttp.ClientSession):
         async with self.get('https://www.zhihu.com/', allow_redirects=False) as r:
             self.logger.debug('尝试获取xsrf token')
             if r.cookies.get('_xsrf'):
-                self.logger.debug('获取成功')
+                self.logger.debug(f'获取成功{r.cookies.get("_xsrf").value}')
                 return r.cookies.get('_xsrf').value
         raise AssertionError('获取 xsrf 失败')
 
@@ -175,6 +175,7 @@ class ZhihuClient(aiohttp.ClientSession):
 
 if __name__ == '__main__':
     from setting import USER, PASSWORD
+
     async def test():
         global client
         client = ZhihuClient(user=USER, password=PASSWORD)
