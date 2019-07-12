@@ -1,3 +1,6 @@
+"""
+保存有知乎登录cookie的ClientSession
+"""
 import aiohttp
 import asyncio
 import base64
@@ -9,7 +12,7 @@ import re
 import os
 import sys
 import time
-import threading
+# import threading
 from typing import Union
 from PIL import Image
 from urllib.parse import urlencode
@@ -19,6 +22,7 @@ from setting import COOKIE_FILE
 
 
 class ZhihuClient(aiohttp.ClientSession):
+    """扩展ClientSession"""
 
     def __init__(self, user='', password='', *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,6 +40,11 @@ class ZhihuClient(aiohttp.ClientSession):
         self.cookie_file = COOKIE_FILE or './static/cookies.pick'
 
     async def login(self, load_cookies: bool=False) -> None:
+        """
+        登录
+        :param load_cookies: 是否加载cookie
+        :return:
+        """
         if load_cookies:
             self.cookie_jar.load(self.cookie_file)
             self.logger.debug(f'加载cookies从:{self.cookie_file}')
@@ -118,8 +127,11 @@ class ZhihuClient(aiohttp.ClientSession):
             #     capt = json.dumps({'img_size': [200, 44],
             #                        'input_points': [[i[0] / 2, i[1] / 2] for i in points]})
             # else:
-            img_thread = threading.Thread(target=img.show, daemon=True)
-            img_thread.start()
+            # img_thread = threading.Thread(target=img.show, daemon=True)
+            # img_thread.start()
+            # TODO 验证码自动识别实现
+            loop = asyncio.get_running_loop()
+            loop.run_in_executor(None, img.show)
             capt = input('请输入图片里的验证码：')
             # 这里必须先把参数 POST 验证码接口
             await self.post(url, data={'input_text': capt})
@@ -177,9 +189,8 @@ if __name__ == '__main__':
     from setting import USER, PASSWORD
 
     async def test():
-        global client
         client = ZhihuClient(user=USER, password=PASSWORD)
         await client.login(load_cookies=True)
-        
-    ioloop = asyncio.get_event_loop()
-    ioloop.run_until_complete(test())
+        await client.close()
+
+    asyncio.run(test())

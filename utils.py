@@ -31,7 +31,7 @@ colour_map = {
 }
 
 
-def print_colour(s: Any, colour: str='green', way: int=0):
+def print_colour(s: Any, colour: str='green', way: int=0, **kwargs):
     """打印颜色"""
-    print(f'\033[{way};{colour_map[colour]};m{s}')
+    print(f'\033[{way};{colour_map[colour]};m{s}', **kwargs)
 

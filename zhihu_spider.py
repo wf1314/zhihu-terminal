@@ -1,3 +1,6 @@
+"""
+知乎api
+"""
 import re
 import asyncio
 from zhihu_client import ZhihuClient
@@ -25,7 +28,7 @@ class ZhihuSpider(object):
             self.logger.debug(result)
         return result
 
-    async def get_recommend_article(self):
+    async def get_recommend_article(self) -> dict:
         """
         获取推荐文章
         :return:
@@ -53,7 +56,7 @@ class ZhihuSpider(object):
             result = await r.json()
         return result
 
-    async def get_comments(self, uid: str):
+    async def get_comments(self, uid: str) -> dict:
         """
         获取评论
         :param id:
@@ -71,8 +74,8 @@ class ZhihuSpider(object):
         result = await r.json()
         # self.logger.debug(result)
         return result
-    
-    async def endorse_comment(self, uid: str, delete: bool = False):
+
+    async def endorse_comment(self, uid: str, delete: bool = False) -> dict:
         """
         赞同评论
         :param uid:
@@ -87,7 +90,7 @@ class ZhihuSpider(object):
         self.logger.debug(result)
         return result
 
-    async def endorse_answer(self, uid, typ: str= 'up'):
+    async def endorse_answer(self, uid, typ: str= 'up') -> dict:
         """
         赞同回答
         :param id:
@@ -104,7 +107,7 @@ class ZhihuSpider(object):
         self.logger.debug(result)
         return result
 
-    async def thank_answer(self, uid: str, delete: bool=False):
+    async def thank_answer(self, uid: str, delete: bool=False) -> dict:
         """
         感谢回答
         :param id:
@@ -134,5 +137,4 @@ if __name__ == '__main__':
         await spider.get_comments('324013933')
         await client.close()
 
-    ioloop = asyncio.get_event_loop()
-    ioloop.run_until_complete(test())
+    asyncio.run(test())

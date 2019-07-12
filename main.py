@@ -1,3 +1,4 @@
+
 import os
 import asyncio
 from zhihu_client import ZhihuClient
@@ -13,7 +14,55 @@ def start():
 
 
 def welcome():
-    pass
+    logo = '''
+                                                                                         ;$$;
+                                                                                    #############
+                                                                               #############;#####o
+                                                      ##                 o#########################
+                                                      #####         $###############################
+                                                      ##  ###$ ######!    ##########################
+                           ##                        ###    $###          ################### ######
+                           ###                      ###                   ##o#######################
+                          ######                  ;###                    #### #####################
+                          ##  ###             ######                       ######&&################
+                          ##    ###      ######                            ## ############ #######
+                         o##      ########                                  ## ##################
+                         ##o                ###                             #### #######o#######
+                         ##               ######                             ###########&#####
+                         ##                ####                               #############!
+                        ###                                                     #########
+               #####&   ##                                                      o####
+             ######     ##                                                   ####*
+                  ##   !##                                               #####
+                   ##  ##*                                            ####; ##
+                    #####                                          #####o   #####
+                     ####                                        ### ###   $###o
+                      ###                                            ## ####! $###
+                      ##                                            #####
+                      ##                                            ##
+                     ;##                                           ###                           ;
+                     ##$                                           ##
+                #######                                            ##
+            #####   &##                                            ##
+          ###       ###                                           ###
+         ###      ###                                             ##
+         ##     ;##                                               ##
+         ##    ###                                                ##
+          ### ###                                                 ##
+            ####                                                  ##
+             ###                                                  ##
+             ##;                                                  ##
+             ##$                                                 ##&
+              ##                                                 ##
+              ##;                                               ##
+               ##                                              ##;
+                ###                                          ###         ##$
+                  ###                                      ###           ##
+   ######################                              #####&&&&&&&&&&&&###
+ ###        $#####$     ############&$o$&################################
+ #                               $&########&o
+'''
+    print_colour(logo, 'blue')
 
 
 def check_setting():
@@ -36,24 +85,19 @@ async def login(user, password):
     return client
 
 
-async def _run():
+async def main():
     client = await login(USER, PASSWORD)
-    try:
-        check_setting()
-        spider = DataExtractor(client)
-        await spider.get_self_info()
-        await spider.get_recommend_article()
-    except Exception as e:
-        print_colour(e, colour='red')
-    finally:
-        await asyncio.sleep(0)
-        await client.close()
-
-
-def main():
-    ioloop = asyncio.get_event_loop()
-    ioloop.run_until_complete(_run())
-
+    check_setting()
+    welcome()
+    spider = DataExtractor(client)
+    output = await spider.get_self_info()
+    print_colour(f'hello {output["name"]} 欢迎使用terminal-zhihu!', 'blue')
+    while True:
+        try:
+            await spider.output_recommend_article()
+        except Exception as e:
+            print_colour(e, colour='red')
+        input('回车刷新')
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

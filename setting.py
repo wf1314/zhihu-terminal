@@ -1,5 +1,5 @@
 
-DEBUG = True
+DEBUG = False
 
 LOG_DIR = ''  # df: /tmp/zhihu
 

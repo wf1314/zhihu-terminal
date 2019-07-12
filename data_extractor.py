@@ -1,9 +1,16 @@
+"""
+处理从知乎获取到的数据,去除不需要的数据
+"""
 from zhihu_spider import ZhihuSpider
-
+from utils import print_colour
 
 class DataExtractor(ZhihuSpider):
 
     async def get_self_info(self):
+        """
+        获取自己的信息
+        :return:
+        """
         result = await super().get_self_info()
         output = {
             'name': result['name'],
@@ -16,7 +23,11 @@ class DataExtractor(ZhihuSpider):
         self.logger.debug(output)
         return output
 
-    async def get_recommend_article(self):
+    async def get_recommend_article(self) -> list:
+        """
+        获取推荐文章
+        :return:
+        """
         result = await super().get_recommend_article()
         output = []
         for d in result['data']:  # 提取用到的数据
@@ -35,7 +46,7 @@ class DataExtractor(ZhihuSpider):
                 'content': target['content'],
                 'voteup_count': target['voteup_count'],  # 赞同数
                 'visited_count': target['visited_count'],
-                'thanks_count': target['thanks_count'],
+                'thanks_count': target.get('thanks_count'),
                 'comment_count': target['comment_count'],
                 'id': target['id'],
                 'created_time': d['created_time'],
@@ -67,8 +78,23 @@ class DataExtractor(ZhihuSpider):
         self.logger.debug(output)
         return output
 
-    async def get_comments(self, uid: str):
+    async def output_recommend_article(self):
+        output = await self.get_recommend_article()
+        for d in output:
+            print_colour('-' * 150, 'black')
+            print_colour(f'id:{d["id"]}')
+            print_colour(d['title'], 'purple', end='')
+            print_colour(f"({d['author']['name']})", 'purple')
+            print_colour(d['excerpt'], colour='blue')
+            print_colour(f"*赞同数{d['voteup_count']} 感谢数{d.get('thanks_count', 0)} "
+                         f"评论数{d['comment_count']} 浏览数{d['visited_count']}*", 'purple')
 
+    async def get_comments(self, uid: str):
+        """
+        获取评论
+        :param uid:
+        :return:
+        """
         result = await super().get_comments(uid)
         output = []
         for d in result['data']:
