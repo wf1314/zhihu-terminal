@@ -5,6 +5,6 @@ LOG_DIR = ''  # df: /tmp/zhihu
 
 COOKIE_FILE = ''  # df: /static/cookies.pick
 
-USER = '13335256039'
+USER = ''
 
-PASSWORD = 'wangfan123'
+PASSWORD = ''
