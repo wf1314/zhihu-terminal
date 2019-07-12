@@ -1,7 +1,7 @@
 import os
 import asyncio
 from zhihu_client import ZhihuClient
-from zhihu_spider import ZhihuSpider
+from data_extractor import DataExtractor
 from setting import USER
 from setting import PASSWORD
 from utils import print_colour
@@ -40,7 +40,7 @@ async def _run():
     client = await login(USER, PASSWORD)
     try:
         check_setting()
-        spider = ZhihuSpider(client)
+        spider = DataExtractor(client)
         await spider.get_self_info()
         await spider.get_recommend_article()
     except Exception as e:

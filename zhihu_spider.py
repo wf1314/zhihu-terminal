@@ -1,7 +1,6 @@
 import re
 import asyncio
 from zhihu_client import ZhihuClient
-from utils import print_colour
 
 
 class ZhihuSpider(object):
@@ -23,18 +22,8 @@ class ZhihuSpider(object):
 
         async with self.client.get(url) as resp:
             result = await resp.json()
-            print_colour(result)
-
-        output = {
-            'name': result['name'],
-            'haealine': result['headline'],
-            'head': result['avatar_url'],
-            'gender': result['gender'],
-            'vip_info': result['vip_info'],
-            'url': result['url'],
-        }
-        self.logger.debug(output)
-        return output
+            self.logger.debug(result)
+        return result
 
     async def get_recommend_article(self):
         """
@@ -62,55 +51,7 @@ class ZhihuSpider(object):
         }
         async with self.client.get(url, params=data) as r:
             result = await r.json()
-
-        output = []
-        for d in result['data']:  # 提取用到的数据
-            target = d['target']
-            author = target['author']
-            question = target.get('question')
-            article_info = {
-                'author': {  # 作者信息
-                    'name': author['name'],
-                    'headline': author.get('headline'),
-                    'head': author['avatar_url'],
-                    'gender': author.get('gender'),
-                    'url': author.get('url'),
-                },
-                'excerpt': target['excerpt_new'],
-                'content': target['content'],
-                'voteup_count': target['voteup_count'],  # 赞同数
-                'visited_count': target['visited_count'],
-                'thanks_count': target['thanks_count'],
-                'comment_count': target['comment_count'],
-                'id': target['id'],
-                'created_time': d['created_time'],
-                'updated_time': d['updated_time'],
-            }
-            if question:
-                question = {
-                    'author': {
-                        'name': question['author']['name'],
-                        'headline': question['author'].get('headline'),
-                        'head': question['author'].get('head'),
-                        'gender': question['author'].get('gender'),
-                        'url': question['author'].get('url'),
-                    },
-                    'title': question['title'],
-                    'url': question['url'],
-                    'type': 'normal',
-                }
-                article_info.update(question)
-            else:
-                question = {
-                    'title': target['title'],
-                    'url': target['url'],
-                    'type': 'market',
-                    'author': article_info['author']
-                }
-                article_info.update(question)
-            output.append(article_info)
-        self.logger.debug(output)
-        return output
+        return result
 
     async def get_comments(self, uid: str):
         """
@@ -129,39 +70,8 @@ class ZhihuSpider(object):
         r = await self.client.get(url, params=params)
         result = await r.json()
         # self.logger.debug(result)
-        output = []
-        for d in result['data']:
-            author = d['author']['member']
-            reply_to_author = d.get('reply_to_author', {}).get('member')
-            comment_info = {
-                'author': {
-                    'name': author.get('name'),
-                    'headline': author.get('headline'),
-                    'head': author.get('head'),
-                    'gender': author.get('gender'),
-                    'url': author.get('url'),
-                },
-                'content': d['content'],
-                'created_time': d['created_time'],
-                'child_comment_count': d['child_comment_count'],
-                'id': d['id'],
-                'vote_count': d['vote_count'],
-                'voting': d['voting'],
-                'type': d['type'],
-                'reply_to_author': {
-                    'name': reply_to_author.get('name'),
-                    'headline': reply_to_author.get('headline'),
-                    'head': reply_to_author.get('head'),
-                    'gender': reply_to_author.get('gender'),
-                    'url': reply_to_author.get('url'),
-                },
-                'child_comments': d['child_comments']
-            }
-            output.append(comment_info)
-        self.logger.debug(output)
-        paging = result['paging']
-        return output
-
+        return result
+    
     async def endorse_comment(self, uid: str, delete: bool = False):
         """
         赞同评论
@@ -173,7 +83,9 @@ class ZhihuSpider(object):
             r = await self.client.delete(url)
         else:
             r = await self.client.post(url)
-        self.logger.debug(await r.text())
+        result = await r.json()
+        self.logger.debug(result)
+        return result
 
     async def endorse_answer(self, uid, typ: str= 'up'):
         """
@@ -188,8 +100,9 @@ class ZhihuSpider(object):
             'type': typ
         }
         r = await self.client.post(url, json=data)
-        result = await r.text()
+        result = await r.json()
         self.logger.debug(result)
+        return result
 
     async def thank_answer(self, uid: str, delete: bool=False):
         """
@@ -203,7 +116,9 @@ class ZhihuSpider(object):
             r = await self.client.delete(url)
         else:
             r = await self.client.post(url)
-        self.logger.debug(await r.text())
+        result = await r.json()
+        self.logger.debug(result)
+        return result
 
 
 if __name__ == '__main__':
