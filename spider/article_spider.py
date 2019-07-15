@@ -4,13 +4,10 @@
 import re
 import asyncio
 from zhihu_client import ZhihuClient
+from utils import SpiderBaseclass
 
 
-class ZhihuSpider(object):
-
-    def __init__(self, client: ZhihuClient):
-        self.client = client
-        self.logger = self.client.logger
+class ArticleSpider(SpiderBaseclass):
 
     async def get_self_info(self) -> dict:
         """

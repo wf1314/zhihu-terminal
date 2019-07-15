@@ -1,10 +1,13 @@
 """
 处理从知乎获取到的数据,去除不需要的数据
 """
-from zhihu_spider import ZhihuSpider
+from spider.article_spider import ArticleSpider
+from spider.comment_spider import CommentSpider
+from spider.user_spider import UserSpider
 from utils import print_colour
 
-class DataExtractor(ZhihuSpider):
+
+class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
 
     async def get_self_info(self):
         """

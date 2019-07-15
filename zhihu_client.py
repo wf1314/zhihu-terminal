@@ -37,7 +37,7 @@ class ZhihuClient(aiohttp.ClientSession):
         }
         self.logger = get_logger()
         self._default_headers.update(headers)
-        self.cookie_file = COOKIE_FILE or './static/cookies.pick'
+        self.cookie_file = COOKIE_FILE or './cookies.pick'
 
     async def login(self, load_cookies: bool=False) -> None:
         """

@@ -35,3 +35,10 @@ def print_colour(s: Any, colour: str='green', way: int=0, **kwargs):
     """打印颜色"""
     print(f'\033[{way};{colour_map[colour]};m{s}', **kwargs)
 
+
+class SpiderBaseclass(object):
+
+    def __init__(self, client):
+        self.client = client
+        self.logger = self.client.logger
+
