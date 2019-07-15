@@ -49,9 +49,9 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 'content': target['content'],
                 'voteup_count': target['voteup_count'],  # 赞同数
                 'visited_count': target['visited_count'],
-                'thanks_count': target.get('thanks_count'),
+                'thanks_count': target.get('thanks_count', 0),
                 'comment_count': target['comment_count'],
-                'id': target['id'],
+                'id': str(target['id']),
                 'created_time': d['created_time'],
                 'updated_time': d['updated_time'],
             }
@@ -80,17 +80,6 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
             output.append(article_info)
         self.logger.debug(output)
         return output
-
-    async def output_recommend_article(self):
-        output = await self.get_recommend_article()
-        for d in output:
-            print_colour('-' * 150, 'black')
-            print_colour(f'id:{d["id"]}')
-            print_colour(d['title'], 'purple', end='')
-            print_colour(f"({d['author']['name']})", 'purple')
-            print_colour(d['excerpt'], colour='blue')
-            print_colour(f"*赞同数{d['voteup_count']} 感谢数{d.get('thanks_count', 0)} "
-                         f"评论数{d['comment_count']} 浏览数{d['visited_count']}*", 'purple')
 
     async def get_comments(self, uid: str):
         """
@@ -131,4 +120,3 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
         self.logger.debug(output)
         paging = result['paging']
         return output
-

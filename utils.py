@@ -1,5 +1,4 @@
 from typing import Any
-
 """
 前景色	背景色	颜色
 30	40	黑色
@@ -29,6 +28,19 @@ colour_map = {
     'ultramarine': '36',
     'white': '37',
 }
+
+cmd_func_map = {
+    'up': 'endorse_answer',
+    'down': 'endorse_answer',
+    'neutral': 'endorse_answer',
+    'thank': 'thank_answer',
+    'unthank': 'thank_answer',
+    'comment': 'get_comments',
+}
+
+
+def get_com_func(cmd):
+    return cmd_func_map[cmd]
 
 
 def print_colour(s: Any, colour: str='green', way: int=0, **kwargs):
