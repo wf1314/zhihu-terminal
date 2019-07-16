@@ -5,4 +5,4 @@
 开发中.....
 
 
-![img](./static/demo.gif)
+![img](./static/demo.gif){: width="40px" height="4px"}
