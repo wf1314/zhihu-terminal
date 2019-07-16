@@ -4,7 +4,6 @@
 from spider.article_spider import ArticleSpider
 from spider.comment_spider import CommentSpider
 from spider.user_spider import UserSpider
-from utils import print_colour
 
 
 class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
@@ -52,6 +51,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 'thanks_count': target.get('thanks_count', 0),
                 'comment_count': target['comment_count'],
                 'id': str(target['id']),
+                'type': target['type'],
                 'created_time': d['created_time'],
                 'updated_time': d['updated_time'],
             }
@@ -66,32 +66,33 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                     },
                     'title': question['title'],
                     'url': question['url'],
+                    'id': str(question['id']),
                     'type': 'normal',
                 }
-                article_info.update(question)
             else:
                 question = {
                     'title': target['title'],
                     'url': target['url'],
                     'type': 'market',
-                    'author': article_info['author']
+                    'id': str(target['id']),
+                    'author': target['author']
                 }
-                article_info.update(question)
+            article_info['question'] = question
             output.append(article_info)
         self.logger.debug(output)
         return output
 
-    async def get_comments(self, uid: str):
+    async def get_comments(self, uid: str, typ:str='answer'):
         """
         获取评论
         :param uid:
         :return:
         """
-        result = await super().get_comments(uid)
+        result = await super().get_comments(uid, typ)
         output = []
         for d in result['data']:
             author = d['author']['member']
-            reply_to_author = d.get('reply_to_author', {}).get('member')
+            reply_to_author = d.get('reply_to_author', {}).get('member', {})
             comment_info = {
                 'author': {
                     'name': author.get('name'),

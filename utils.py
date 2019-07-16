@@ -35,7 +35,7 @@ cmd_func_map = {
     'neutral': 'endorse_answer',
     'thank': 'thank_answer',
     'unthank': 'thank_answer',
-    'comment': 'get_comments',
+    'read-cmt': 'get_comments',
 }
 
 

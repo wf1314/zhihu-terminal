@@ -1,10 +1,11 @@
 import os
 import asyncio
-import html2text
 from zhihu_client import ZhihuClient
 from data_extractor import DataExtractor
 
 from print_beautify import print_recommend_article
+from print_beautify import print_article_content
+from print_beautify import print_comments
 
 from utils import print_colour
 from utils import get_com_func
@@ -83,6 +84,7 @@ def recommend_help():
            "**********************************************************\n" \
            "**  id(文章id)\n" \
            "**  f:               刷新内容\n" \
+           "**  r:               再次显示(重新显示回答)\n" \
            "**  help:            显示更多功能\n" \
            "**  back:            返回上层\n" \
            "**  q:               退出系统\n" \
@@ -95,17 +97,17 @@ def recommend_help_2():
     output = "\n" \
             "**********************************************************\n" \
             "**  id(文章id)\n" \
-            "**  f:               刷新内容\n" \
-            "**  r:               再次显示(重新显示回答)\n" \
-            "**  back:            返回上层\n" \
-            "**  q:               退出系统\n" \
-            "**  up-id:           赞同\n" \
-            "**  down-id:         反对\n" \
-            "**  neutral-id:      中立,可以取消对回答的赞同或反对\n" \
-            "**  thank-id:        感谢\n" \
-            "**  unthank-id:      取消感谢\n"\
-            "**  comment-id:      查看评论\n"\
-            "**  check-id:        查看回答具体内容\n" \
+            "**  f               刷新内容\n" \
+            "**  r               再次显示(重新显示回答)\n" \
+            "**  back            返回上层\n" \
+            "**  q               退出系统\n" \
+            "**  up:id           赞同\n" \
+            "**  down:id         反对\n" \
+            "**  neutral:id      中立,可以取消对回答的赞同或反对\n" \
+            "**  thank:id        感谢\n" \
+            "**  unthank:id      取消感谢\n"\
+            "**  read-cmt:id      查看评论\n"\
+            "**  read:id         查看回答具体内容\n" \
             "**\n" \
             "**********************************************************\n"
     return output
@@ -157,13 +159,16 @@ async def run(client):
                     is_print = False
                 if is_input:
                     remd_cmd = input(recommend_help)
-                remd_cmd = remd_cmd.split('-')
+                remd_cmd = remd_cmd.split(':')
                 if not remd_cmd:
                     print_colour('输入有误!', 'red')
                     is_input = True
                     continue
                 if remd_cmd[0] == 'f':
                     is_print = True
+                    continue
+                elif remd_cmd[0] == 'r':
+                    print_recommend_article(recommend_articles)
                     continue
                 elif remd_cmd[0] == 'back':
                     break
@@ -174,7 +179,7 @@ async def run(client):
                     remd_cmd = input(recommend_help_2)
                     is_input = False
                     continue
-                elif remd_cmd[0] in ('up', 'down', 'neutral', 'thank', 'unthank', 'comment', 'check'):
+                elif remd_cmd[0] in ('up', 'down', 'neutral', 'thank', 'unthank', 'read_cmt', 'read'):
                     if len(remd_cmd) != 2:
                         print_colour('输入有误!', 'red')
                         is_input = True
@@ -183,17 +188,25 @@ async def run(client):
                         print_colour('输入id有误!', 'red')
                         is_input = True
                         continue
-                    if remd_cmd[0] == 'check':
-                        content = [d['content'] for d in recommend_articles if d['id'] == remd_cmd[1]][0]
-                        content = html2text.html2text(content)
-                        print_colour(content)
+                    if remd_cmd[0] == 'read':
+                        output = [d for d in recommend_articles if d['id'] == remd_cmd[1]][0]
+                        print_article_content(output)
                         continue
+                    if remd_cmd[0] == 'read-cmt':
+                        output = [d for d in recommend_articles if d['id'] == remd_cmd[1]][0]
+                        typ = output['type']
+                        result = await spider.get_comments(remd_cmd[1], typ)
+                        print_comments(result)  # TODO
+                        import pdb;pdb.set_trace()
                     else:
                         func = get_com_func(remd_cmd[0])
                         result = await getattr(spider, func)(remd_cmd[1])
                         print_colour(result)
                         continue
-                is_input = True
+                else:
+                    print_colour('输入有误!', 'red')
+                    is_input = True
+                    continue
 
         elif cmd == 'aten':
             pass
@@ -205,9 +218,10 @@ async def main():
         client = await login(USER, PASSWORD)
         welcome()
         await run(client)
-    except Exception as e:
-        print_colour(e, 'red')
+    # except Exception as e:
+    #     print_colour(e, 'red')
     finally:
+        print_colour('欢迎再次使用')
         await asyncio.sleep(0)
         await client.close()
 

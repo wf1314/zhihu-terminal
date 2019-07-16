@@ -35,6 +35,7 @@ class ArticleSpider(SpiderBaseclass):
         }
         async with self.client.get(url, params=data) as r:
             result = await r.json()
+        self.logger.debug(result)
         return result
 
     async def endorse_answer(self, uid, typ: str= 'up') -> dict:
@@ -57,7 +58,7 @@ class ArticleSpider(SpiderBaseclass):
     async def thank_answer(self, uid: str, delete: bool=False) -> dict:
         """
         感谢回答
-        :param id:
+        :param uid:
         :param delete:
         :return:
         """
