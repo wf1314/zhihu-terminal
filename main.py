@@ -64,7 +64,7 @@ def welcome():
      ###        $#####$     ############&$o$&################################
      #                               $&########&o
     '''
-    print_colour(logo, 'blue')
+    print_colour(logo, 'ultramarine')
 
 
 def main_help():
@@ -83,7 +83,7 @@ def recommend_help():
     output = "\n" \
            "**********************************************************\n" \
            "**  id(文章id)\n" \
-           "**  f:               刷新内容\n" \
+           "**  f:               刷新推荐内容\n" \
            "**  r:               再次显示(重新显示回答)\n" \
            "**  help:            显示更多功能\n" \
            "**  back:            返回上层\n" \
@@ -139,12 +139,13 @@ async def run(client):
     global recommend_help_2
     spider = DataExtractor(client)
     output = await spider.get_self_info()
-    print_colour(f'hello {output["name"]} 欢迎使用terminal-zhihu!', 'blue')
+    print_colour(f'hello {output["name"]} 欢迎使用terminal-zhihu!', 'ultramarine')
     main_help = main_help()
     recommend_help = recommend_help()
     recommend_help_2 = recommend_help_2()
     flag = True
     while flag:
+        print_colour('', 'yellow')
         cmd = input(main_help)
         if cmd in ('q', 'quit', 'exit'):
             break
@@ -158,6 +159,7 @@ async def run(client):
                     print_recommend_article(recommend_articles)
                     is_print = False
                 if is_input:
+                    print_colour('', 'yellow')
                     remd_cmd = input(recommend_help)
                 remd_cmd = remd_cmd.split(':')
                 if not remd_cmd:
@@ -166,9 +168,11 @@ async def run(client):
                     continue
                 if remd_cmd[0] == 'f':
                     is_print = True
+                    is_input = True
                     continue
                 elif remd_cmd[0] == 'r':
                     print_recommend_article(recommend_articles)
+                    is_input = True
                     continue
                 elif remd_cmd[0] == 'back':
                     break
@@ -176,10 +180,11 @@ async def run(client):
                     flag = False
                     break
                 elif remd_cmd[0] == 'help':
+                    print_colour('', 'yellow')
                     remd_cmd = input(recommend_help_2)
                     is_input = False
                     continue
-                elif remd_cmd[0] in ('up', 'down', 'neutral', 'thank', 'unthank', 'read_cmt', 'read'):
+                elif remd_cmd[0] in ('up', 'down', 'neutral', 'thank', 'unthank', 'read-cmt', 'read'):
                     if len(remd_cmd) != 2:
                         print_colour('输入有误!', 'red')
                         is_input = True
