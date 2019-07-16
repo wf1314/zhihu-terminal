@@ -185,13 +185,12 @@ async def run(client):
                     is_input = False
                     continue
                 elif remd_cmd[0] in ('up', 'down', 'neutral', 'thank', 'unthank', 'read-cmt', 'read'):
+                    is_input = True
                     if len(remd_cmd) != 2:
                         print_colour('输入有误!', 'red')
-                        is_input = True
                         continue
                     if remd_cmd[1] not in ids:
                         print_colour('输入id有误!', 'red')
-                        is_input = True
                         continue
                     if remd_cmd[0] == 'read':
                         output = [d for d in recommend_articles if d['id'] == remd_cmd[1]][0]
