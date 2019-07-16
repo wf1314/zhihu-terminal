@@ -7,3 +7,5 @@
 
 <source id="mp4" src="./static/demonstration.mp4" type="video/mp4">
 </video>
+
+[![ScreenShot](/static/demonstration.jpg)](/static/demonstration.mp4)
