@@ -2,7 +2,7 @@ import html2text
 from utils import print_colour
 
 
-def print_recommend_article(output):
+def print_recommend_article(output: list):
     """
     打印推荐文章简述
     :param output:
@@ -18,7 +18,7 @@ def print_recommend_article(output):
                      f"评论数{d['comment_count']} 浏览数{d['visited_count']}*", 'purple')
 
 
-def print_article_content(output):
+def print_article_content(output: dict):
     """
     打印文章内容
     :param output:
@@ -32,7 +32,7 @@ def print_article_content(output):
     print_colour(content)
 
 
-def print_comments(output):
+def print_comments(output: list):
     """
     打印评论
     :param output:

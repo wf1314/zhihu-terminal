@@ -2,11 +2,10 @@ from utils import SpiderBaseclass
 
 
 class UserSpider(SpiderBaseclass):
-
+    """用户信息爬取"""
     async def get_self_info(self) -> dict:
         """
         获取我的信息
-        :param session:
         :return:
         """
         url = 'https://www.zhihu.com/api/v4/me?include=ad_type;available_message_types,' \

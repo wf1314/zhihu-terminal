@@ -7,8 +7,9 @@ from spider.user_spider import UserSpider
 
 
 class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
+    """数据提取"""
 
-    async def get_self_info(self):
+    async def get_self_info(self) -> dict:
         """
         获取自己的信息
         :return:
@@ -82,9 +83,10 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
         self.logger.debug(output)
         return output
 
-    async def get_comments(self, uid: str, typ:str='answer'):
+    async def get_comments(self, uid: str, typ: str ='answer') -> list:
         """
         获取评论
+        :param typ:
         :param uid:
         :return:
         """

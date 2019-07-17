@@ -8,7 +8,7 @@ from utils import SpiderBaseclass
 
 
 class ArticleSpider(SpiderBaseclass):
-
+    """文章相关"""
     async def get_recommend_article(self) -> dict:
         """
         获取推荐文章
@@ -38,10 +38,10 @@ class ArticleSpider(SpiderBaseclass):
         self.logger.debug(result)
         return result
 
-    async def endorse_answer(self, uid, typ: str= 'up') -> dict:
+    async def endorse_answer(self, uid: str, typ: str= 'up') -> dict:
         """
         赞同回答
-        :param id:
+        :param uid:
         :param typ: up赞同, down踩, neutral中立
         :return:
         """

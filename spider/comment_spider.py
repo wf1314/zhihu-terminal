@@ -2,11 +2,13 @@ from utils import SpiderBaseclass
 
 
 class CommentSpider(SpiderBaseclass):
+    """评论爬取"""
 
     async def get_comments(self, uid: str, typ: str='answer') -> dict:
         """
         获取评论
-        :param id:
+        :param uid:
+        :param typ:
         :return:
         """
         url = f'https://www.zhihu.com/api/v4/{typ}s/{uid}/root_comments'
@@ -27,6 +29,7 @@ class CommentSpider(SpiderBaseclass):
         """
         赞同评论
         :param uid:
+        :param delete:
         :return:
         """
         url = f'https://www.zhihu.com/api/v4/comments/{uid}/actions/like'
