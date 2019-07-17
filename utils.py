@@ -1,3 +1,4 @@
+import os
 from typing import Any
 """
 前景色	背景色	颜色
@@ -48,9 +49,15 @@ def print_colour(s: Any, colour: str='green', way: int=0, **kwargs):
     print(f'\033[{way};{colour_map[colour]};m{s}', **kwargs)
 
 
+abs_dir = lambda: os.path.dirname(os.path.abspath(__file__))
+
+
 class SpiderBaseclass(object):
 
     def __init__(self, client):
         self.client = client
         self.logger = self.client.logger
 
+
+if __name__ == '__main__':
+    ...

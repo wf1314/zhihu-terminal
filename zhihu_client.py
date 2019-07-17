@@ -17,6 +17,7 @@ from typing import Union
 from PIL import Image
 from urllib.parse import urlencode
 from utils import print_colour
+from utils import abs_dir
 from log import get_logger
 from setting import COOKIE_FILE
 
@@ -36,8 +37,7 @@ class ZhihuClient(aiohttp.ClientSession):
                           '(KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586',
         }
         self.logger = get_logger()
-        self._default_headers.update(headers)
-        self.cookie_file = COOKIE_FILE or './cookies.pick'
+        self.cookie_file = COOKIE_FILE or '/tmp/cookies.pick'
 
     async def login(self, load_cookies: bool=False) -> None:
         """
@@ -97,6 +97,9 @@ class ZhihuClient(aiohttp.ClientSession):
             is_succ = await self.check_login()
             if is_succ:
                 print_colour('登录成功!', colour='green')
+            else:
+                print_colour('登录失败!', colour='red')
+                sys.exit()
 
     async def _get_captcha(self) -> str:
         """
@@ -116,9 +119,9 @@ class ZhihuClient(aiohttp.ClientSession):
                 resp = await r.text()
             json_data = json.loads(resp)
             img_base64 = json_data['img_base64'].replace(r'\n', '')
-            with open('./captcha.jpg', 'wb') as f:
+            with open(f'{abs_dir}/captcha.jpg', 'wb') as f:
                 f.write(base64.b64decode(img_base64))
-            img = Image.open('./captcha.jpg')
+            img = Image.open(f'{abs_dir}/captcha.jpg')
             # if lang == 'cn':
             #     import matplotlib.pyplot as plt
             #     plt.imshow(img)
@@ -144,12 +147,16 @@ class ZhihuClient(aiohttp.ClientSession):
         如登录成功保存当前 Cookies
         :return: bool
         """
-        url = 'https://zhihu.com'
+        url = 'https://www.zhihu.com/'
         async with self.get(url, allow_redirects=False) as r:
             if r.status == 200:
                 self.cookie_jar.save(self.cookie_file)
                 self.logger.debug(f'保存cookies到->{self.cookie_file}')
                 return True
+            else:
+                self.logger.debug(await r.text())
+                self.logger.debug(r.headers)
+                self.logger.debug(r.status)
             return False
 
     async def _get_xsrf(self) -> str:
@@ -180,7 +187,7 @@ class ZhihuClient(aiohttp.ClientSession):
 
     @staticmethod
     def _encrypt(form_data: dict) -> str:
-        with open('./static/encrypt.js') as f:
+        with open(f'{abs_dir}/static/encrypt.js') as f:
             js = execjs.compile(f.read())
             return js.call('Q', urlencode(form_data))
 
@@ -194,3 +201,4 @@ if __name__ == '__main__':
         await client.close()
 
     asyncio.run(test())
+
