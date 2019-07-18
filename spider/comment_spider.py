@@ -19,7 +19,7 @@ class CommentSpider(SpiderBaseclass):
             'status': 'open',
         }
 
-        r = await self.client.get(url, params=params, proxy='http://10.10.9.56:8888', verify_ssl=False)
+        r = await self.client.get(url, params=params, verify_ssl=False)
         self.logger.debug(await r.text())
         result = await r.json()
         self.logger.debug(result)

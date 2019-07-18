@@ -14,7 +14,7 @@ def get_logger():
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     log = logging.getLogger(__name__)
-    log.setLevel(logging.DEBUG) if DEBUG else log.setLevel(logging.INFO)
+    log.setLevel(logging.DEBUG) if DEBUG else log.setLevel(logging.ERROR)
     log_file = os.path.join(log_dir, 'log.log')
     handler = RotatingFileHandler(log_file, maxBytes=1024 * 1024 * 30, backupCount=10)
     handler1 = logging.StreamHandler()

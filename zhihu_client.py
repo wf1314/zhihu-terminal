@@ -17,7 +17,6 @@ from typing import Union
 from PIL import Image
 from urllib.parse import urlencode
 from utils import print_colour
-from utils import abs_dir
 from log import get_logger
 from setting import COOKIE_FILE
 
@@ -30,12 +29,14 @@ class ZhihuClient(aiohttp.ClientSession):
         self.user = user
         self.password = password
         headers = {
-            'accept-encoding': 'gzip, deflate, br',
             'Host': 'www.zhihu.com',
-            'Referer': 'https://www.zhihu.com/',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
                           '(KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586',
+            'Connection': 'Keep-Alive',
+            'Referer': 'https://www.zhihu.com/',
+            'accept-encoding': 'gzip, deflate',
         }
+        self._default_headers = headers
         self.logger = get_logger()
         self.cookie_file = COOKIE_FILE or '/tmp/cookies.pick'
 
@@ -119,9 +120,9 @@ class ZhihuClient(aiohttp.ClientSession):
                 resp = await r.text()
             json_data = json.loads(resp)
             img_base64 = json_data['img_base64'].replace(r'\n', '')
-            with open(f'{abs_dir}/captcha.jpg', 'wb') as f:
+            with open(f'./captcha.jpg', 'wb') as f:
                 f.write(base64.b64decode(img_base64))
-            img = Image.open(f'{abs_dir}/captcha.jpg')
+            img = Image.open(f'./captcha.jpg')
             # if lang == 'cn':
             #     import matplotlib.pyplot as plt
             #     plt.imshow(img)
@@ -187,7 +188,7 @@ class ZhihuClient(aiohttp.ClientSession):
 
     @staticmethod
     def _encrypt(form_data: dict) -> str:
-        with open(f'{abs_dir}/static/encrypt.js') as f:
+        with open(f'./static/encrypt.js') as f:
             js = execjs.compile(f.read())
             return js.call('Q', urlencode(form_data))
 

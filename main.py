@@ -6,6 +6,7 @@ from data_extractor import DataExtractor
 from print_beautify import print_recommend_article
 from print_beautify import print_article_content
 from print_beautify import print_comments
+from print_beautify import print_vote_thank
 
 from utils import print_colour
 from utils import get_com_func
@@ -146,7 +147,7 @@ async def run(client):
     flag = True
     while flag:
         print_colour('', 'yellow')
-        cmd = input(main_help)
+        cmd = input(main_help).lower()
         if cmd in ('q', 'quit', 'exit'):
             break
         elif cmd == 'remd':
@@ -160,7 +161,7 @@ async def run(client):
                     is_print = False
                 if is_input:
                     print_colour('', 'yellow')
-                    remd_cmd = input(recommend_help)
+                    remd_cmd = input(recommend_help).lower()
                 remd_cmd = remd_cmd.split(':')
                 if not remd_cmd:
                     print_colour('输入有误!', 'red')
@@ -181,7 +182,7 @@ async def run(client):
                     break
                 elif remd_cmd[0] == 'help':
                     print_colour('', 'yellow')
-                    remd_cmd = input(recommend_help_2)
+                    remd_cmd = input(recommend_help_2).lower()
                     is_input = False
                     continue
                 elif remd_cmd[0] in ('up', 'down', 'neutral', 'thank', 'unthank', 'read-cmt', 'read'):
@@ -205,7 +206,7 @@ async def run(client):
                     else:
                         func = get_com_func(remd_cmd[0])
                         result = await getattr(spider, func)(remd_cmd[1])
-                        print_colour(result)
+                        print_vote_thank(result, remd_cmd[0])
                         continue
                 else:
                     print_colour('输入有误!', 'red')

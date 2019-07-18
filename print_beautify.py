@@ -39,3 +39,21 @@ def print_comments(output: list):
     :return:
     """
     pass
+
+
+def print_vote_thank(output: dict, typ: str):
+    """
+    打印赞同感谢  up', 'down', 'neutral'
+    :param output:
+    :return:
+    """
+    if output.get('error'):
+        print_colour(output.get('error'), 'red')
+    elif typ == 'thank':
+        print_colour('点击感谢成功!重复点击将取消感谢')
+    elif typ == 'up':
+        print_colour('赞同成功!')
+    elif typ == 'down':
+        print_colour('反对成功!')
+    else:
+        print_colour('保持中立!')
