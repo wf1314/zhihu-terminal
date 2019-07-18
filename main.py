@@ -8,65 +8,13 @@ from print_beautify import print_recommend_article
 from print_beautify import print_article_content
 from print_beautify import print_comments
 from print_beautify import print_vote_thank
+from print_beautify import print_log
 
 from utils import print_colour
 from utils import get_com_func
 
 from setting import USER
 from setting import PASSWORD
-
-
-def welcome():
-    os.system("clear")
-    logo = '''
-                                                                                             ;$$;
-                                                                                        #############
-                                                                                   #############;#####o
-                                                          ##                 o#########################
-                                                          #####         $###############################
-                                                          ##  ###$ ######!    ##########################
-                               ##                        ###    $###          ################### ######
-                               ###                      ###                   ##o#######################
-                              ######                  ;###                    #### #####################
-                              ##  ###             ######                       ######&&################
-                              ##    ###      ######                            ## ############ #######
-                             o##      ########                                  ## ##################
-                             ##o                ###                             #### #######o#######
-                             ##               ######                             ###########&#####
-                             ##                ####                               #############!
-                            ###                                                     #########
-                   #####&   ##                                                      o####
-                 ######     ##                                                   ####*
-                      ##   !##                                               #####
-                       ##  ##*                                            ####; ##
-                        #####                                          #####o   #####
-                         ####                                        ### ###   $###o
-                          ###                                            ## ####! $###
-                          ##                                            #####
-                          ##                                            ##
-                         ;##                                           ###                           ;
-                         ##$                                           ##
-                    #######                                            ##
-                #####   &##                                            ##
-              ###       ###                                           ###
-             ###      ###                                             ##
-             ##     ;##                                               ##
-             ##    ###                                                ##
-              ### ###                                                 ##
-                ####                                                  ##
-                 ###                                                  ##
-                 ##;                                                  ##
-                 ##$                                                 ##&
-                  ##                                                 ##
-                  ##;                                               ##
-                   ##                                              ##;
-                    ###                                          ###         ##$
-                      ###                                      ###           ##
-       ######################                              #####&&&&&&&&&&&&###
-     ###        $#####$     ############&$o$&################################
-     #                               $&########&o
-    '''
-    print_colour(logo, 'ultramarine')
 
 
 def help_main():
@@ -112,6 +60,10 @@ def help_article():
     return output
 
 
+def help_comments():
+    pass
+
+
 def check_setting():
     pass
 
@@ -143,7 +95,12 @@ async def deal_comments(spider):
     :param spider:
     :return:
     """
-    pass
+    while True:
+        print_colour('', 'yellow')
+        remd_cmd = input(help_comments()).lower()
+        remd_cmd = remd_cmd.split(':')
+        # TODO
+        import pdb;pdb.set_trace()
 
 
 async def deal_article(spider, recommend_articles, ids):
@@ -256,7 +213,7 @@ async def main():
     try:
         check_setting()
         client = await login(USER, PASSWORD)
-        welcome()
+        print_log()
         await run(client)
     # except Exception as e:
     #     print_colour(e, 'red')
