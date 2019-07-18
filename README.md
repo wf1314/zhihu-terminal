@@ -24,7 +24,6 @@ Python 3.7
 ```
 pip install -r requirements.txt
 ```
-TODO: docker实现
 
 ## 本地运行
 
@@ -35,3 +34,7 @@ TODO: docker实现
 ```
 python main.py
 ```
+
+## TODO
+知乎网页功能模拟
+docker实现
