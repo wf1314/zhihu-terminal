@@ -50,7 +50,9 @@ def print_vote_thank(output: dict, typ: str):
     if output.get('error'):
         print_colour(output.get('error'), 'red')
     elif typ == 'thank':
-        print_colour('点击感谢成功!重复点击将取消感谢')
+        print_colour('感谢成功!')
+    elif typ == 'unthank':
+        print_colour('取消感谢')
     elif typ == 'up':
         print_colour('赞同成功!')
     elif typ == 'down':

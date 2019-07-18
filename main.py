@@ -1,4 +1,5 @@
 import os
+import sys
 import asyncio
 from zhihu_client import ZhihuClient
 from data_extractor import DataExtractor
@@ -68,7 +69,7 @@ def welcome():
     print_colour(logo, 'ultramarine')
 
 
-def main_help():
+def help_main():
     output = "\n" \
            "**********************************************************\n" \
            "**\n" \
@@ -80,13 +81,13 @@ def main_help():
     return output
 
 
-def recommend_help():
+def help_recommend():
     output = "\n" \
            "**********************************************************\n" \
            "**  id(文章id)\n" \
            "**  f:               刷新推荐内容\n" \
            "**  r:               再次显示(重新显示回答)\n" \
-           "**  help:            显示更多功能\n" \
+           "**  read:id          查看回答具体内容\n" \
            "**  back:            返回上层\n" \
            "**  q:               退出系统\n" \
            "**\n" \
@@ -94,12 +95,10 @@ def recommend_help():
     return output
 
 
-def recommend_help_2():
+def help_article():
     output = "\n" \
             "**********************************************************\n" \
             "**  id(文章id)\n" \
-            "**  f               刷新内容\n" \
-            "**  r               再次显示(重新显示回答)\n" \
             "**  back            返回上层\n" \
             "**  q               退出系统\n" \
             "**  up:id           赞同\n" \
@@ -108,7 +107,6 @@ def recommend_help_2():
             "**  thank:id        感谢\n" \
             "**  unthank:id      取消感谢\n"\
             "**  read-cmt:id      查看评论\n"\
-            "**  read:id         查看回答具体内容\n" \
             "**\n" \
             "**********************************************************\n"
     return output
@@ -134,85 +132,122 @@ async def login(user, password):
     return client
 
 
+def exit(cmd: str):
+    if cmd in('q', 'quit', 'exit'):
+        sys.exit()
+
+
+async def deal_comments(spider):
+    """
+    处理评论命令
+    :param spider:
+    :return:
+    """
+    pass
+
+
+async def deal_article(spider, recommend_articles, ids):
+    """
+    处理文章内容命令
+    :param spider:
+    :param recommend_articles:
+    :param ids:
+    :return:
+    """
+    while True:
+        print_colour('', 'yellow')
+        remd_cmd = input(help_article()).lower()
+        remd_cmd = remd_cmd.split(':')
+        if not remd_cmd:
+            print_colour('输入有误!', 'red')
+            continue
+        exit(remd_cmd[0])
+        if remd_cmd[0] == 'back':
+            break
+        elif remd_cmd[0] in ('up', 'down', 'neutral', 'thank', 'unthank', 'read-cmt'):
+            if len(remd_cmd) != 2:
+                print_colour('输入有误!', 'red')
+                continue
+            if remd_cmd[1] not in ids:
+                print_colour('输入id有误!', 'red')
+                continue
+            if remd_cmd[0] == 'read':
+                output = [d for d in recommend_articles if d['id'] == remd_cmd[1]][0]
+                print_article_content(output)
+                continue
+            if remd_cmd[0] == 'read-cmt':
+                output = [d for d in recommend_articles if d['id'] == remd_cmd[1]][0]
+                typ = output['type']
+                result = await spider.get_comments(remd_cmd[1], typ)
+                print_comments(result)  # TODO
+                import pdb;
+                pdb.set_trace()
+                await deal_comments(spider)
+            else:
+                func = get_com_func(remd_cmd[0])
+                result = await getattr(spider, func)(remd_cmd[1])
+                print_vote_thank(result, remd_cmd[0])
+                continue
+        else:
+            print_colour('输入有误!', 'red')
+            continue
+
+
+async def deal_remd(spider):
+    """
+    处理推荐文章命令
+    :param spider:
+    :return:
+    """
+    is_print = True
+    while True:
+        if is_print:
+            recommend_articles = await spider.get_recommend_article()
+            ids = [d.get('id') for d in recommend_articles]
+            print_recommend_article(recommend_articles)
+            is_print = False
+        print_colour('', 'yellow')
+        remd_cmd = input(help_recommend()).lower()
+        remd_cmd = remd_cmd.split(':')
+        if not remd_cmd:
+            print_colour('输入有误!', 'red')
+            continue
+        exit(remd_cmd[0])
+        if remd_cmd[0] == 'f':
+            is_print = True
+            continue
+        elif remd_cmd[0] == 'r':
+            print_recommend_article(recommend_articles)
+            continue
+        elif remd_cmd[0] == 'read':
+            if len(remd_cmd) != 2:
+                print_colour('输入有误!', 'red')
+                continue
+            if remd_cmd[1] not in ids:
+                print_colour('输入id有误!', 'red')
+                continue
+            output = [d for d in recommend_articles if d['id'] == remd_cmd[1]][0]
+            print_article_content(output)
+            await deal_article(spider, recommend_articles, ids)
+            continue
+        elif remd_cmd[0] == 'back':
+            break
+        else:
+            print_colour('输入有误!', 'red')
+            continue
+
+
 async def run(client):
-    global main_help
-    global recommend_help
-    global recommend_help_2
     spider = DataExtractor(client)
     output = await spider.get_self_info()
     print_colour(f'hello {output["name"]} 欢迎使用terminal-zhihu!', 'ultramarine')
-    main_help = main_help()
-    recommend_help = recommend_help()
-    recommend_help_2 = recommend_help_2()
     flag = True
     while flag:
         print_colour('', 'yellow')
-        cmd = input(main_help).lower()
-        if cmd in ('q', 'quit', 'exit'):
-            break
-        elif cmd == 'remd':
-            is_print = True
-            is_input = True
-            while True:
-                if is_print:
-                    recommend_articles = await spider.get_recommend_article()
-                    ids = [d.get('id') for d in recommend_articles]
-                    print_recommend_article(recommend_articles)
-                    is_print = False
-                if is_input:
-                    print_colour('', 'yellow')
-                    remd_cmd = input(recommend_help).lower()
-                remd_cmd = remd_cmd.split(':')
-                if not remd_cmd:
-                    print_colour('输入有误!', 'red')
-                    is_input = True
-                    continue
-                if remd_cmd[0] == 'f':
-                    is_print = True
-                    is_input = True
-                    continue
-                elif remd_cmd[0] == 'r':
-                    print_recommend_article(recommend_articles)
-                    is_input = True
-                    continue
-                elif remd_cmd[0] == 'back':
-                    break
-                elif remd_cmd[0] in ('q', 'quit', 'exit'):
-                    flag = False
-                    break
-                elif remd_cmd[0] == 'help':
-                    print_colour('', 'yellow')
-                    remd_cmd = input(recommend_help_2).lower()
-                    is_input = False
-                    continue
-                elif remd_cmd[0] in ('up', 'down', 'neutral', 'thank', 'unthank', 'read-cmt', 'read'):
-                    is_input = True
-                    if len(remd_cmd) != 2:
-                        print_colour('输入有误!', 'red')
-                        continue
-                    if remd_cmd[1] not in ids:
-                        print_colour('输入id有误!', 'red')
-                        continue
-                    if remd_cmd[0] == 'read':
-                        output = [d for d in recommend_articles if d['id'] == remd_cmd[1]][0]
-                        print_article_content(output)
-                        continue
-                    if remd_cmd[0] == 'read-cmt':
-                        output = [d for d in recommend_articles if d['id'] == remd_cmd[1]][0]
-                        typ = output['type']
-                        result = await spider.get_comments(remd_cmd[1], typ)
-                        print_comments(result)  # TODO
-                        import pdb;pdb.set_trace()
-                    else:
-                        func = get_com_func(remd_cmd[0])
-                        result = await getattr(spider, func)(remd_cmd[1])
-                        print_vote_thank(result, remd_cmd[0])
-                        continue
-                else:
-                    print_colour('输入有误!', 'red')
-                    is_input = True
-                    continue
-
+        cmd = input(help_main()).lower()
+        exit(cmd)
+        if cmd == 'remd':
+            await deal_remd(spider)
         elif cmd == 'aten':
             pass
 
