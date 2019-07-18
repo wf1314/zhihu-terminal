@@ -24,7 +24,7 @@ Python 3.7
 ```
 pip install -r requirements.txt
 ```
-TODO: dockers实现
+TODO: docker实现
 
 ## 本地运行
 
