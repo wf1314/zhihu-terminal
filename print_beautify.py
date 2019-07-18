@@ -64,7 +64,8 @@ def print_recommend_article(output: list):
     """
     for d in output:
         print_colour('=' * 60, 'white')
-        print_colour(f'id:{d["id"]}')
+        print_colour(f'article_id:{d["id"]}')
+        print_colour(f'question_id:{d["question"]["id"]}')
         print_colour(d['question']['title'], 'purple', end='')
         print_colour(f"({d['author']['name']})", 'purple')
         print_colour(d['excerpt'])
@@ -80,10 +81,14 @@ def print_article_content(output: dict):
     """
     content = output['content']
     title = output['question']['title']
-    print_colour(f'id:{output["id"]}')
-    print_colour(f'title:{title}', 'purple')
+    question_id = output['question']['id']
     content = html2text.html2text(content)
     print_colour(content)
+    print_colour('-----------------------------------------------------', 'purple')
+    print_colour(f'|article_id:{output["id"]}', 'purple')
+    print_colour(f'|question_id:{question_id}', 'purple')
+    print_colour(f'|title:{title}', 'purple')
+    print_colour('-----------------------------------------------------', 'purple')
 
 
 def print_comments(output: list):
