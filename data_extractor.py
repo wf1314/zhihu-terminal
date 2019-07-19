@@ -83,17 +83,19 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
         self.logger.debug(output)
         return output
 
-    async def get_comments(self, uid: str, typ: str ='answer') -> list:
+    def extract_comments(self, result: dict) -> tuple:
         """
-        获取评论
-        :param typ:
-        :param uid:
+        提取评论
+        :param result:
         :return:
         """
-        result = await super().get_comments(uid, typ)
         output = []
         for d in result['data']:
             author = d['author']['member']
+            for clild in d['child_comments']:
+                clild['author'] = clild['author']['member']
+                if clild['reply_to_author'].get('member'):
+                    clild['reply_to_author'] = clild['reply_to_author']['member']
             reply_to_author = d.get('reply_to_author', {}).get('member', {})
             comment_info = {
                 'author': {
@@ -110,6 +112,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 'vote_count': d['vote_count'],
                 'voting': d['voting'],
                 'type': d['type'],
+                'featured': d.get('featured'),  # 是否是热评
                 'reply_to_author': {
                     'name': reply_to_author.get('name'),
                     'headline': reply_to_author.get('headline'),
@@ -122,4 +125,24 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
             output.append(comment_info)
         self.logger.debug(output)
         paging = result['paging']
-        return output
+        return output, paging
+
+    async def get_comments(self, uid: str, typ: str ='answer') -> tuple:
+        """
+        获取评论
+        :param typ:
+        :param uid:
+        :return:
+        """
+        result = await super().get_comments(uid, typ)
+        output, paging = self.extract_comments(result)
+        return output, paging
+
+    async def get_comments_by_url(self, url: str) -> tuple:
+        """
+        获取评论
+        :return:
+        """
+        result = await super().get_comments_by_url(url)
+        output, paging = self.extract_comments(result)
+        return output, paging

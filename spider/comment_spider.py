@@ -11,6 +11,7 @@ class CommentSpider(SpiderBaseclass):
         :param typ:
         :return:
         """
+        # uid = '720626601'
         url = f'https://www.zhihu.com/api/v4/{typ}s/{uid}/root_comments'
         params = {
             'order': 'normal',
@@ -19,7 +20,20 @@ class CommentSpider(SpiderBaseclass):
             'status': 'open',
         }
 
-        r = await self.client.get(url, params=params, verify_ssl=False)
+        r = await self.client.get(url, params=params)
+        self.logger.debug(await r.text())
+        result = await r.json()
+        self.logger.debug(result)
+        return result
+
+    async def get_comments_by_url(self, url) -> dict:
+        """
+        获取评论
+        :param uid:
+        :param typ:
+        :return:
+        """
+        r = await self.client.get(url)
         self.logger.debug(await r.text())
         result = await r.json()
         self.logger.debug(result)
@@ -40,3 +54,18 @@ class CommentSpider(SpiderBaseclass):
         result = await r.json()
         self.logger.debug(result)
         return result
+
+
+if __name__ == '__main__':
+    import asyncio
+    from setting import USER, PASSWORD
+    from zhihu_client import ZhihuClient
+
+    async def test():
+        client = ZhihuClient(user=USER, password=PASSWORD)
+        await client.login(load_cookies=True)
+        spider = CommentSpider(client)
+        await spider.get_comments('123')
+        await client.close()
+
+    asyncio.run(test())

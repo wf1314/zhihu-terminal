@@ -32,8 +32,8 @@ def help_recommend():
            "**********************************************************\n" \
            "**  f:                       刷新推荐内容\n" \
            "**  r:                       再次显示(重新显示回答)\n" \
-           "**  read:article_id          查看回答具体内容\n" \
-           "**  question:question_id     查看回答具体内容\n" \
+           "**  read:article_id          查看回答具体内容(进入下一级菜单)\n" \
+           "**  question:question_id     查看问题下的其他回答(进入下一级菜单)\n" \
            "**  back:                    返回上层\n" \
            "**  q:                       退出系统\n" \
            "**********************************************************\n"
@@ -43,7 +43,6 @@ def help_recommend():
 def help_article():
     output = "\n" \
             "**********************************************************\n" \
-            "**  question                查看回答具体内容\n" \
             "**  back                    返回上层\n" \
             "**  q                       退出系统\n" \
             "**  up                      赞同\n" \
@@ -51,13 +50,33 @@ def help_article():
             "**  neutral                 中立,可以取消对回答的赞同或反对\n" \
             "**  thank                   感谢\n" \
             "**  unthank                 取消感谢\n"\
-            "**  comment                 评论相关(查看评论, 回复评论等)\n"\
+            "**  comment                 评论相关(查看评论, 回复评论等将进入下一级菜单)\n"\
             "**********************************************************\n"
     return output
 
 
 def help_comments():
-    pass
+    output = "\n" \
+            "**********************************************************\n" \
+            "**  back                    返回上层\n" \
+            "**  q                       退出系统\n" \
+            "**  n                       显示下一页" \
+            "**  p                       显示上一页" \
+            "**  com:comment_id          回复评论,点赞等功能(进入下级菜单)" \
+            "**********************************************************\n"
+    return output
+
+
+def help_comments2():
+    output = "\n" \
+            "**********************************************************\n" \
+            "**  back                    返回上层\n" \
+            "**  q                       退出系统\n" \
+            "**  up                      点赞" \
+            "**  neutral                 中立,可以取消对点赞" \
+            "**  reply:content           回复评论" \
+            "**********************************************************\n"
+    return output
 
 
 def check_setting():
@@ -85,17 +104,63 @@ def exit(cmd: str):
         sys.exit()
 
 
-async def deal_comments(spider):
+async def deal_comments_by_id(spider):
+    """
+    对应id评论相关
+    :param spider:
+    :return:
+    """
+    pass
+
+
+async def deal_comments(spider, result, paging):
     """
     处理评论命令
     :param spider:
     :return:
     """
+    # all_coments = []
     while True:
+        comment_ids = []
+        for d in result:
+            comment_ids.append(d['id'])
+            for clild in d.get('child_comments'):
+                comment_ids.append(clild['id'])
+        comment_ids = list(set(comment_ids))
         print_colour('', 'yellow')
-        remd_cmd = input(help_comments()).lower()
-        remd_cmd = remd_cmd.split(':')
-        # TODO 处理评论命令
+        comm_cmd = input(help_comments()).lower()
+        comm_cmd = comm_cmd.split(':')
+        if not comm_cmd:
+            print_colour('输入有误!', 'red')
+            continue
+        exit(comm_cmd[0])
+        if comm_cmd[0] == 'back':
+            break
+        elif comm_cmd[0] == 'n':
+            if paging.get('is_end'):
+                print_colour('已是最后一页!', 'red')
+                continue
+            url = paging['next']
+            result, paging = await spider.get_comments_by_url(url)
+            print_comments(result)
+            continue
+        elif comm_cmd[0] == 'p':
+            if paging.get('is_start'):
+                print_colour('已是第一页!', 'red')
+                continue
+            url = paging['previous']
+            result, paging = await spider.get_comments_by_url(url)
+            print_comments(result)
+            continue
+        elif comm_cmd[0] == 'com':
+            if len(comm_cmd) != 2:
+                print_colour('输入有误!', 'red')
+                continue
+            if comm_cmd[1] not in comment_ids:
+                print_colour('输入id有误!', 'red')
+                continue
+            await deal_comments_by_id(spider)
+            continue
         import pdb;pdb.set_trace()
 
 
@@ -109,30 +174,29 @@ async def deal_article(spider, article):
     """
     while True:
         print_colour('', 'yellow')
-        remd_cmd = input(help_article()).lower()
-        if not remd_cmd:
+        arl_cmd = input(help_article()).lower()
+        if not arl_cmd:
             print_colour('输入有误!', 'red')
             continue
-        exit(remd_cmd)
-        if remd_cmd == 'back':
+        exit(arl_cmd)
+        if arl_cmd == 'back':
             break
 
-        elif remd_cmd in ('up', 'down', 'neutral', 'thank', 'unthank'):
+        elif arl_cmd in ('up', 'down', 'neutral', 'thank', 'unthank'):
 
             uid = article.get('id')
-            func = get_com_func(remd_cmd)
+            func = get_com_func(arl_cmd)
             result = await getattr(spider, func)(uid)
-            print_vote_thank(result, remd_cmd)
+            print_vote_thank(result, arl_cmd)
             continue
-        elif remd_cmd == 'comment':
+        elif arl_cmd == 'comment':
             typ = article['type']
             uid = article.get('id')
-            result = await spider.get_comments(uid, typ)
-            print_comments(result)  # TODO 输出评论信息
-            import pdb;
-            pdb.set_trace()
-            await deal_comments(spider)
-        elif remd_cmd == 'question':
+            result, paging = await spider.get_comments(uid, typ)
+            print_comments(result)
+            await deal_comments(spider, result, paging)
+            continue
+        elif arl_cmd == 'question':
             # todo 查看问题下的其他回答
             continue
         else:
@@ -195,6 +259,9 @@ async def run(client):
     while flag:
         print_colour('', 'yellow')
         cmd = input(help_main()).lower()
+        if not cmd:
+            print_colour('输入有误!', 'red')
+            continue
         exit(cmd)
         if cmd == 'remd':
             await deal_remd(spider)

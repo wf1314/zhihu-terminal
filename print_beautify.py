@@ -64,8 +64,8 @@ def print_recommend_article(output: list):
     """
     for d in output:
         print_colour('=' * 60, 'white')
-        print_colour(f'article_id:{d["id"]}')
-        print_colour(f'question_id:{d["question"]["id"]}')
+        print_colour(f'article_id:{d["id"]}', 'purple')
+        print_colour(f'question_id:{d["question"]["id"]}', 'purple')
         print_colour(d['question']['title'], 'purple', end='')
         print_colour(f"({d['author']['name']})", 'purple')
         print_colour(d['excerpt'])
@@ -97,7 +97,38 @@ def print_comments(output: list):
     :param output:
     :return:
     """
-    pass
+    for d in output:
+        author = d.get('author').get('name')
+        reply_to_author = d.get('reply_to_author').get('name')
+        content = d.get('content')
+        vote_count = d.get('vote_count')
+        comment_id = d.get('id')
+        child_comments = d.get('child_comments')
+        print_colour(f'comment_id:{comment_id}', 'purple')
+        if d.get('featured'):
+            print_colour('热评🔥', end='')
+        if reply_to_author:
+            print_colour(f'{author}->{reply_to_author}', end='')
+        else:
+            print_colour(f'{author}', end='')
+        print_colour(f'(赞:{vote_count}):{content}')
+        if child_comments:
+            for clild in child_comments:
+                author = clild.get('author').get('name')
+                reply_to_author = clild.get('reply_to_author').get('name')
+                content = clild.get('content')
+                vote_count = clild.get('vote_count')
+                comment_id = clild.get('id')
+                print_colour(f'         comment_id:{comment_id}', 'purple')
+                if d.get('featured'):
+                    print_colour('         热评🔥', end='')
+                if reply_to_author:
+                    print_colour(f'         {author}->{reply_to_author}', end='')
+                else:
+                    print_colour(f'         {author}', end='')
+                print_colour(f'         (赞:{vote_count}):{content}')
+                print_colour('         *********************************************************', 'blue')
+        print_colour('==========================================================', 'blue')
 
 
 def print_vote_thank(output: dict, typ: str):
