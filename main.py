@@ -320,16 +320,14 @@ async def run(client):
             continue
 
 
-
-
 async def main():
     try:
         check_setting()
         client = await login(USER, PASSWORD)
         print_logo()
         await run(client)
-    # except Exception as e:
-    #     print_colour(e, 'red')
+    except Exception as e:
+        print_colour(e, 'red')
     finally:
         print_colour('欢迎再次使用')
         await asyncio.sleep(0)
@@ -337,4 +335,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.get_event_loop().run_until_complete(main())
