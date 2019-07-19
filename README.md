@@ -4,8 +4,8 @@
 
 开发中.....目前仅实现了极少的功能,有想要参与开发的可以邮件我sgwf525@126.com
 
-## 演示GIF
-<img width="400" height="400" src="./static/show.gif"/>
+## 目前功能
+<img width="800" height="500" src="/static/zhihu-terminal.jpg"/>
 
 
 ## 项目介绍
@@ -34,8 +34,3 @@ pip install -r requirements.txt
 ```
 python main.py
 ```
-
-## TODO
-知乎网页功能模拟
-
-docker实现
