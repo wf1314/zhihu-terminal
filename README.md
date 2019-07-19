@@ -8,6 +8,10 @@
 <img width="800" height="500" src="/static/zhihu-terminal.jpg"/>
 
 
+## GIF演示
+<img width="500" height="500" src="/static/show.gif"/>
+
+
 ## 项目介绍
 本项目为知乎的终端版实现,基于asyncio实现全异步操作
 
