@@ -1,9 +1,9 @@
 import os
 import html2text
 from utils import print_colour
+from setting import SAVE_DIR
 
-
-def print_log():
+def print_logo():
     os.system("clear")
     logo = '''
                                                                                              ;$$;
@@ -163,3 +163,22 @@ def print_vote_comments(output: dict, typ: str):
         print_colour(f'点赞评论成功!被赞总数{output["vote_count"]}')
     elif typ == 'neutral':
         print_colour(f'保持中立!被赞总数{output["vote_count"]}')
+
+
+def print_save(article: dict):
+    """
+    保存文章到本地
+    :param article:
+    :return:
+    """
+    uid = article.get('id')
+    title = article.get('question').get('title')
+    content = article.get('content')
+    save_dir = SAVE_DIR or '/tmp/zhihu_save'
+    file = f'{save_dir}/{title}_{uid}.html'
+    with open(file, 'w') as f:
+        head = '<head> <meta charset="utf-8"><meta http-equiv="Content-Type"' \
+               ' content="text/html; charset=utf-8" /> </head>'
+        f.write(head)
+        f.write(content)
+    print_colour(f'保存成功!-->{file}')

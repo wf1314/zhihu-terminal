@@ -9,13 +9,15 @@ from print_beautify import print_article_content
 from print_beautify import print_comments
 from print_beautify import print_vote_thank
 from print_beautify import print_vote_comments
-from print_beautify import print_log
+from print_beautify import print_logo
+from print_beautify import print_save
 
 from utils import print_colour
 from utils import get_com_func
 
 from setting import USER
 from setting import PASSWORD
+from setting import SAVE_DIR
 
 
 def help_main():
@@ -46,6 +48,8 @@ def help_article():
             "**********************************************************\n" \
             "**  back                    返回上层\n" \
             "**  q                       退出系统\n" \
+            "**  save                    保存到本地\n" \
+            "**  enshrine                收藏回答\n" \
             "**  up                      赞同\n" \
             "**  down                    反对\n" \
             "**  neutral                 中立,可以取消对回答的赞同或反对\n" \
@@ -81,7 +85,9 @@ def help_comments2():
 
 
 def check_setting():
-    pass
+    save_dir = SAVE_DIR or '/tmp/zhihu_save'
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
 
 
 async def login(user, password):
@@ -227,6 +233,13 @@ async def deal_article(spider, article):
             print_comments(result)
             await deal_comments(spider, result, paging)
             continue
+        elif arl_cmd == 'save':
+            print_save(article)
+            continue
+        elif arl_cmd == 'enshrine':
+            # todo 收藏回答
+            print_colour('功能还在开发中...', 'red')
+            continue
         elif arl_cmd == 'question':
             # todo 查看问题下的其他回答
             print_colour('功能还在开发中...', 'red')
@@ -299,14 +312,21 @@ async def run(client):
         if cmd == 'remd':
             await deal_remd(spider)
         elif cmd == 'aten':
-            pass
+            # todo 获取关注动态
+            print_colour('功能还在开发中...', 'red')
+            continue
+        else:
+            print_colour('输入有误!', 'red')
+            continue
+
+
 
 
 async def main():
     try:
         check_setting()
         client = await login(USER, PASSWORD)
-        print_log()
+        print_logo()
         await run(client)
     # except Exception as e:
     #     print_colour(e, 'red')
