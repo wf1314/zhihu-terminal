@@ -45,7 +45,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                     'gender': author.get('gender'),
                     'url': author.get('url'),
                 },
-                'excerpt': target['excerpt_new'],
+                'excerpt': target.get('excerpt_new') or target.get('excerpt'),
                 'content': target['content'],
                 'voteup_count': target['voteup_count'],  # 赞同数
                 'visited_count': target['visited_count'],
