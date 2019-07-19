@@ -108,7 +108,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 'content': d['content'],
                 'created_time': d['created_time'],
                 'child_comment_count': d['child_comment_count'],
-                'id': d['id'],
+                'id': str(d['id']),
                 'vote_count': d['vote_count'],
                 'voting': d['voting'],
                 'type': d['type'],

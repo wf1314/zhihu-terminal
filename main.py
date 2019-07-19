@@ -8,6 +8,7 @@ from print_beautify import print_recommend_article
 from print_beautify import print_article_content
 from print_beautify import print_comments
 from print_beautify import print_vote_thank
+from print_beautify import print_vote_comments
 from print_beautify import print_log
 
 from utils import print_colour
@@ -60,9 +61,9 @@ def help_comments():
             "**********************************************************\n" \
             "**  back                    返回上层\n" \
             "**  q                       退出系统\n" \
-            "**  n                       显示下一页" \
-            "**  p                       显示上一页" \
-            "**  com:comment_id          回复评论,点赞等功能(进入下级菜单)" \
+            "**  n                       显示下一页\n" \
+            "**  p                       显示上一页\n" \
+            "**  com:comment_id          回复评论,点赞等功能(进入下级菜单)\n" \
             "**********************************************************\n"
     return output
 
@@ -72,9 +73,9 @@ def help_comments2():
             "**********************************************************\n" \
             "**  back                    返回上层\n" \
             "**  q                       退出系统\n" \
-            "**  up                      点赞" \
-            "**  neutral                 中立,可以取消对点赞" \
-            "**  reply:content           回复评论" \
+            "**  up                      点赞\n" \
+            "**  neutral                 中立,可以取消对点赞\n" \
+            "**  reply:content           回复评论\n" \
             "**********************************************************\n"
     return output
 
@@ -104,12 +105,40 @@ def exit(cmd: str):
         sys.exit()
 
 
-async def deal_comments_by_id(spider):
+async def deal_comments_by_id(spider, uid):
     """
     对应id评论相关
     :param spider:
     :return:
     """
+    while True:
+        print_colour('', 'yellow')
+        com2_cmd = input(help_comments2()).lower()
+        com2_cmd = com2_cmd.split(':')
+        if not com2_cmd[0]:
+            print_colour('输入有误!', 'red')
+            continue
+        exit(com2_cmd[0])
+        if com2_cmd[0] == 'back':
+            break
+        elif com2_cmd[0] == 'up':
+            result = await spider.endorse_comment(uid, False)
+            print_vote_comments(result, 'up')
+        elif com2_cmd[0] == 'neutral':
+            result = await spider.endorse_comment(uid, True)
+            print_colour(result)
+            print_vote_comments(result, 'neutral')
+        elif com2_cmd[0] == 'reply' and len(com2_cmd) == 2:
+            # todo 回复评论
+            data = {
+                'content': com2_cmd[1],
+                'replyToId': uid,
+            }
+            print_colour('功能还在开发中...', 'red')
+            continue
+        else:
+            print_colour('输入有误!', 'red')
+            continue
     pass
 
 
@@ -140,7 +169,7 @@ async def deal_comments(spider, result, paging):
             if paging.get('is_end'):
                 print_colour('已是最后一页!', 'red')
                 continue
-            url = paging['next']
+            url = paging['next'].replace('https://www.zhihu.com/', 'https://www.zhihu.com/api/v4/')
             result, paging = await spider.get_comments_by_url(url)
             print_comments(result)
             continue
@@ -148,7 +177,7 @@ async def deal_comments(spider, result, paging):
             if paging.get('is_start'):
                 print_colour('已是第一页!', 'red')
                 continue
-            url = paging['previous']
+            url = paging['previous'].replace('https://www.zhihu.com/', 'https://www.zhihu.com/api/v4/')
             result, paging = await spider.get_comments_by_url(url)
             print_comments(result)
             continue
@@ -159,9 +188,11 @@ async def deal_comments(spider, result, paging):
             if comm_cmd[1] not in comment_ids:
                 print_colour('输入id有误!', 'red')
                 continue
-            await deal_comments_by_id(spider)
+            await deal_comments_by_id(spider, comm_cmd[1])
             continue
-        import pdb;pdb.set_trace()
+        else:
+            print_colour('输入有误!', 'red')
+            continue
 
 
 async def deal_article(spider, article):
@@ -198,6 +229,7 @@ async def deal_article(spider, article):
             continue
         elif arl_cmd == 'question':
             # todo 查看问题下的其他回答
+            print_colour('功能还在开发中...', 'red')
             continue
         else:
             print_colour('输入有误!', 'red')
@@ -243,6 +275,7 @@ async def deal_remd(spider):
             continue
         elif remd_cmd[0] == 'question':
             # todo 查看问题下的其他回答
+            print_colour('功能还在开发中...', 'red')
             continue
         elif remd_cmd[0] == 'back':
             break

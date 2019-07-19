@@ -140,12 +140,26 @@ def print_vote_thank(output: dict, typ: str):
     if output.get('error'):
         print_colour(output.get('error'), 'red')
     elif typ == 'thank':
-        print_colour('感谢成功!')
+        print_colour(f'感谢成功!感谢总数{output["thanks_count"]}')
     elif typ == 'unthank':
-        print_colour('取消感谢')
+        print_colour(f'取消感谢!感谢总数{output["thanks_count"]}')
     elif typ == 'up':
-        print_colour('赞同成功!')
+        print_colour(f'赞同成功!赞同总数{output["voteup_count"]}')
     elif typ == 'down':
-        print_colour('反对成功!')
+        print_colour(f'反对成功!赞同总数{output["voteup_count"]}')
     else:
-        print_colour('保持中立!')
+        print_colour(f'保持中立!赞同总数{output["voteup_count"]}')
+
+
+def print_vote_comments(output: dict, typ: str):
+    """
+    打印赞同感谢  up', 'down', 'neutral'
+    :param output:
+    :return:
+    """
+    if output.get('error'):
+        print_colour(output.get('error'), 'red')
+    elif typ == 'up':
+        print_colour(f'点赞评论成功!被赞总数{output["vote_count"]}')
+    elif typ == 'neutral':
+        print_colour(f'保持中立!被赞总数{output["vote_count"]}')
