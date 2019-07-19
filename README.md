@@ -1,6 +1,6 @@
 # zhihu-terminal
 摸鱼神器,命令行版知乎
-
+灵感来自[duduainankai/zhihu-terminal](https://github.com/duduainankai/zhihu-terminal)
 
 开发中.....目前仅实现了极少的功能,有想要参与开发的可以邮件我sgwf525@126.com
 
@@ -9,11 +9,11 @@
 
 
 ## GIF演示
-<img width="500" height="500" src="/static/show.gif"/>
+<img width="500" height="500" src="/static/show1.gif"/>
 
 
 ## 项目介绍
-本项目为知乎的终端版实现,基于asyncio实现全异步操作
+本项目为知乎的终端版实现,基于asyncio实现
 
 运行此项目即可以使用命令行的方式来操作知乎,功能涵盖:浏览,点赞,感谢等功能,未来将实现知乎网页端的绝大部分功能
 
