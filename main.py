@@ -51,6 +51,7 @@ def help_article():
             "**  q                       退出系统\n" \
             "**  save                    保存到本地\n" \
             "**  enshrine                收藏回答\n" \
+            "**  question                查看问题下的其他回答\n" \
             "**  up                      赞同\n" \
             "**  down                    反对\n" \
             "**  neutral                 中立,可以取消对回答的赞同或反对\n" \
@@ -238,15 +239,14 @@ async def deal_article(spider, article):
             print_colour('功能还在开发中...', 'red')
             continue
         elif arl_cmd == 'question':
-            # todo 查看问题下的其他回答
-            print_colour('功能还在开发中...', 'red')
+            await deal_question(spider, article.get('question').get('id'), article.get('id'))
             continue
         else:
             print_colour('输入有误!', 'red')
             continue
 
 
-async def deal_question(spider, question_id, id_map):
+async def deal_question(spider, question_id, uid):
     """
     处理问题命令
     :param spider:
@@ -280,7 +280,7 @@ async def deal_question(spider, question_id, id_map):
             await deal_article(spider, output)
             continue
         elif ques_cmd[0] == 'question':
-            question_detail = await spider.get_question_details(question_id, id_map[question_id])
+            question_detail = await spider.get_question_details(question_id, uid)
             print_question(question_detail)
         elif ques_cmd[0] == 'n':
             if paging.get('is_end'):
@@ -354,8 +354,8 @@ async def deal_remd(spider):
                 continue
             assert len(ids) == len(question_ids)
             id_map = dict(zip(question_ids, ids))
-
-            await deal_question(spider, remd_cmd[1], id_map)
+            uid = id_map[remd_cmd[1]]
+            await deal_question(spider, remd_cmd[1], uid)
             continue
         elif remd_cmd[0] == 'back':
             break
