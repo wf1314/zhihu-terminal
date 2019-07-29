@@ -38,3 +38,11 @@ pip install -r requirements.txt
 ```
 python main.py
 ```
+
+开发中的功能:
+
+获取关注内容(TODO)
+收藏回答(TODO)
+回复评论(TODO)
+验证码自动识别(TODO)
+查看用户主页信息(TODO)
