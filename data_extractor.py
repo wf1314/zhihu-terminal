@@ -1,6 +1,8 @@
 """
 处理从知乎获取到的数据,去除不需要的数据
 """
+import json
+from pyquery import PyQuery as pq
 from spider.article_spider import ArticleSpider
 from spider.comment_spider import CommentSpider
 from spider.user_spider import UserSpider
@@ -48,7 +50,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 'excerpt': target.get('excerpt_new') or target.get('excerpt'),
                 'content': target['content'],
                 'voteup_count': target['voteup_count'],  # 赞同数
-                'visited_count': target['visited_count'],
+                'visited_count': target.get('visited_count'),
                 'thanks_count': target.get('thanks_count', 0),
                 'comment_count': target['comment_count'],
                 'id': str(target['id']),
@@ -75,7 +77,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                     'title': target['title'],
                     'url': target['url'],
                     'type': 'market',
-                    'id': str(target['id']),
+                    'id': '',
                     'author': target['author']
                 }
             article_info['question'] = question
@@ -145,4 +147,122 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
         """
         result = await super().get_comments_by_url(url)
         output, paging = self.extract_comments(result)
+        return output, paging
+
+    async def get_question_details(self, question_id: str, uid: str) -> dict:
+        """
+        获取评论
+        :return:
+        """
+        result = await super().get_question_article_first(question_id, uid)
+        doc = pq(result)
+        data = doc('#js-initialData').text()
+        result = json.loads(data)
+        questions = list(result['initialState']['entities']['questions'].values())[0]
+        # answers = list(result['initialState']['entities']['answers'].values())[0]
+        output = {
+                'id': questions['id'],
+                'type': questions['type'],
+                'title': questions['title'],
+                'creTime': questions.get('creTime') or questions.get('created'),
+                'excerpt': questions['excerpt'],
+                'detail': questions['detail'],
+                'author': questions['author'],
+                'answerCount': questions['answerCount'],
+                'visitCount': questions['visitCount'],
+                'comment_count': questions['commentCount'],
+                'followerCount': questions['followerCount'],
+        }
+        return output
+    # TODO
+    # async def get_first_answer_by_qustion(self, question_id: str, uid: str) -> dict:
+    #     """
+    #     获取第一个回答,这个回答很可能在后续的查询中查询不到
+    #     :return:
+    #     """
+    #     result = await super().get_question_article_first(question_id, uid)
+    #     doc = pq(result)
+    #     data = doc('#js-initialData').text()
+    #     result = json.loads(data)
+    #     # questions = list(result['initialState']['entities']['questions'].values())[0]
+    #     answers = list(result['initialState']['entities']['answers'].values())[0]
+    #     output = {
+    #             'author': {
+    #                 ''
+    #             }
+    #     }
+    #     return output
+
+    def extract_article_by_question(self, result):
+        """
+        提取文章信息
+        :param result:
+        :return:
+        """
+        output = []
+        for d in result['data']:  # 提取用到的数据
+            target = d
+            author = target['author']
+            question = target.get('question')
+            article_info = {
+                'author': {  # 作者信息
+                    'name': author['name'],
+                    'headline': author.get('headline'),
+                    'head': author['avatar_url'],
+                    'gender': author.get('gender'),
+                    'url': author.get('url'),
+                },
+                'excerpt': target.get('excerpt_new') or target.get('excerpt'),
+                'content': target['content'],
+                'voteup_count': target['voteup_count'],  # 赞同数
+                'visited_count': target.get('visited_count', 0),
+                'thanks_count': target.get('thanks_count', 0),
+                'comment_count': target['comment_count'],
+                'id': str(target['id']),
+                'type': target['type'],
+                'created_time': d['created_time'],
+                'updated_time': d['updated_time'],
+            }
+            if question:
+                question = {
+                    'title': question['title'],
+                    'url': question['url'],
+                    'id': str(question['id']),
+                    'type': 'normal',
+                }
+            else:
+                question = {
+                    'title': target['title'],
+                    'url': target['url'],
+                    'type': 'market',
+                    'id': '',
+                }
+            article_info['question'] = question
+            output.append(article_info)
+        return output
+
+    async def get_article_by_question(self, question_id, offset: int = 0, limit: int = 3) -> tuple:
+        """
+
+        :param question_id:
+        :param offset:
+        :param limit:
+        :return:
+        """
+        result = await super().get_article_by_question(question_id, offset, limit)
+        output = self.extract_article_by_question(result)
+        paging = result['paging']
+        self.logger.debug(output)
+        return output, paging
+
+    async def get_article_by_question_url(self, url):
+        """
+
+        :param url:
+        :return:
+        """
+        result = await super().get_article_by_question_url(url)
+        output = self.extract_article_by_question(result)
+        paging = result['paging']
+        self.logger.debug(output)
         return output, paging

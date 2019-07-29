@@ -3,6 +3,7 @@ import html2text
 from utils import print_colour
 from setting import SAVE_DIR
 
+
 def print_logo():
     os.system("clear")
     logo = '''
@@ -69,8 +70,8 @@ def print_recommend_article(output: list):
         print_colour(d['question']['title'], 'purple', end='')
         print_colour(f"({d['author']['name']})", 'purple')
         print_colour(d['excerpt'])
-        print_colour(f"*赞同数{d['voteup_count']} 感谢数{d.get('thanks_count', 0)} "
-                     f"评论数{d['comment_count']} 浏览数{d['visited_count']}*", 'purple')
+        print_colour(f"*赞同数{d.get('voteup_count')} 感谢数{d.get('thanks_count', 0)} "
+                     f"评论数{d.get('comment_count')} 浏览数{d.get('visited_count')}*", 'purple')
 
 
 def print_article_content(output: dict):
@@ -90,6 +91,22 @@ def print_article_content(output: dict):
     print_colour(f'|title:{title}', 'purple')
     print_colour('-----------------------------------------------------', 'purple')
 
+
+def print_question(question: dict):
+    """
+    打印问题及第默认排序下的第一个回答
+    :param output:
+    :return:
+    """
+    title = question['title']
+    # question_id = question['id']
+    question_content = question['detail']
+    question_content = html2text.html2text(question_content)
+    print_colour('*' * 50, 'purple')
+    print_colour(f'标题:{title}')
+    print_colour('问题详情:')
+    print_colour(question_content)
+    print_colour('*' * 50, 'purple')
 
 def print_comments(output: list):
     """

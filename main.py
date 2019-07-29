@@ -7,6 +7,7 @@ from data_extractor import DataExtractor
 from print_beautify import print_recommend_article
 from print_beautify import print_article_content
 from print_beautify import print_comments
+from print_beautify import print_question
 from print_beautify import print_vote_thank
 from print_beautify import print_vote_comments
 from print_beautify import print_logo
@@ -84,31 +85,27 @@ def help_comments2():
     return output
 
 
-def check_setting():
-    save_dir = SAVE_DIR or '/tmp/zhihu_save'
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-
-
-async def login(user, password):
-    """
-    登录
-    :param user:
-    :param password:
-    :return:
-    """
-    client = ZhihuClient(user, password)
-    load_cookies = False
-    if os.path.exists(client.cookie_file):
-        # 如果cookie缓存存在优先读取缓存
-        load_cookies = True
-    await client.login(load_cookies=load_cookies)
-    return client
+def help_question():
+    output = "\n" \
+            "**********************************************************\n" \
+            "**  back                    返回上层\n" \
+            "**  q                       退出系统\n" \
+            "**  question                查看问题详情\n" \
+            "**  read:article_id         查看回答具体内容(进入下一级菜单)\n" \
+            "**  n                       显示下一页\n" \
+            "**  p                       显示上一页\n" \
+            "**  r                       再次显示(重新显示回答)\n" \
+            "**********************************************************\n"
+    return output
 
 
 def exit(cmd: str):
     if cmd in('q', 'quit', 'exit'):
         sys.exit()
+
+
+def clear():
+    os.system("clear")
 
 
 async def deal_comments_by_id(spider, uid):
@@ -249,6 +246,67 @@ async def deal_article(spider, article):
             continue
 
 
+async def deal_question(spider, question_id, id_map):
+    """
+    处理问题命令
+    :param spider:
+    :param uid:
+    :param id_map:
+    :return:
+    """
+    is_print = True
+    while True:
+        if is_print:
+            question_articles, paging = await spider.get_article_by_question(question_id)
+            ids = [d.get('id') for d in question_articles]
+            print_recommend_article(question_articles)
+            is_print = False
+        print_colour('', 'yellow')
+        ques_cmd = input(help_question()).lower()
+        ques_cmd = ques_cmd.split(':')
+        if not ques_cmd:
+            print_colour('输入有误!', 'red')
+            continue
+        exit(ques_cmd[0])
+        if ques_cmd[0] == 'read':
+            if len(ques_cmd) != 2:
+                print_colour('输入有误!', 'red')
+                continue
+            if ques_cmd[1] not in ids:
+                print_colour('输入id有误!', 'red')
+                continue
+            output = [d for d in question_articles if d['id'] == ques_cmd[1]][0]
+            print_article_content(output)
+            await deal_article(spider, output)
+            continue
+        elif ques_cmd[0] == 'question':
+            question_detail = await spider.get_question_details(question_id, id_map[question_id])
+            print_question(question_detail)
+        elif ques_cmd[0] == 'n':
+            if paging.get('is_end'):
+                print_colour('已是最后一页!', 'red')
+                continue
+            url = paging['next']
+            question_articles, paging = await spider.get_article_by_question_url(url)
+            print_recommend_article(question_articles)
+            continue
+        elif ques_cmd[0] == 'p':
+            if paging.get('is_start'):
+                print_colour('已是第一页!', 'red')
+                continue
+            url = paging['previous']
+            question_articles, paging = await spider.get_article_by_question_url(url)
+            print_recommend_article(question_articles)
+        elif ques_cmd[0] == 'r':
+            print_recommend_article(question_articles)
+            continue
+        elif ques_cmd[0] == 'back':
+            break
+        else:
+            print_colour('输入有误!', 'red')
+            continue
+
+
 async def deal_remd(spider):
     """
     处理推荐文章命令
@@ -287,8 +345,17 @@ async def deal_remd(spider):
             await deal_article(spider, output)
             continue
         elif remd_cmd[0] == 'question':
-            # todo 查看问题下的其他回答
-            print_colour('功能还在开发中...', 'red')
+            question_ids = [d.get('question').get('id') for d in recommend_articles]
+            if len(remd_cmd) != 2:
+                print_colour('输入有误!', 'red')
+                continue
+            if remd_cmd[1] not in question_ids:
+                print_colour('输入id有误!', 'red')
+                continue
+            assert len(ids) == len(question_ids)
+            id_map = dict(zip(question_ids, ids))
+
+            await deal_question(spider, remd_cmd[1], id_map)
             continue
         elif remd_cmd[0] == 'back':
             break
@@ -320,14 +387,36 @@ async def run(client):
             continue
 
 
+def check_setting():
+    save_dir = SAVE_DIR or '/tmp/zhihu_save'
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+
+async def login(user, password):
+    """
+    登录
+    :param user:
+    :param password:
+    :return:
+    """
+    client = ZhihuClient(user, password)
+    load_cookies = False
+    if os.path.exists(client.cookie_file):
+        # 如果cookie缓存存在优先读取缓存
+        load_cookies = True
+    await client.login(load_cookies=load_cookies)
+    return client
+
+
 async def main():
     try:
         check_setting()
         client = await login(USER, PASSWORD)
         print_logo()
         await run(client)
-    except Exception as e:
-        print_colour(e, 'red')
+    # except Exception as e:
+    #     print_colour(e, 'red')
     finally:
         print_colour('欢迎再次使用')
         await asyncio.sleep(0)
