@@ -39,7 +39,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-开发中的功能:
+## 开发中的功能:
 
 获取关注内容(TODO)
 
