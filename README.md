@@ -2,7 +2,7 @@
 摸鱼神器,命令行版知乎
 灵感来自[duduainankai/zhihu-terminal](https://github.com/duduainankai/zhihu-terminal)
 
-开发中.....目前仅实现了极少的功能,有想要参与开发的可以邮件我sgwf525@126.com
+开发中.....目前仅实现了部分基本功能,有想要参与开发的可以邮件我sgwf525@126.com
 
 ## 目前功能
 <img width="800" height="500" src="/static/zhihu-terminal.jpg"/>
