@@ -91,7 +91,7 @@ def help_question():
             "**********************************************************\n" \
             "**  back                    返回上层\n" \
             "**  q                       退出系统\n" \
-            "**  question                查看问题详情\n" \
+            "**  qsdl                    查看问题详情\n" \
             "**  read:article_id         查看回答具体内容(进入下一级菜单)\n" \
             "**  n                       显示下一页\n" \
             "**  p                       显示上一页\n" \
@@ -279,7 +279,7 @@ async def deal_question(spider, question_id, uid):
             print_article_content(output)
             await deal_article(spider, output)
             continue
-        elif ques_cmd[0] == 'question':
+        elif ques_cmd[0] == 'qsdl':
             question_detail = await spider.get_question_details(question_id, uid)
             print_question(question_detail)
         elif ques_cmd[0] == 'n':
