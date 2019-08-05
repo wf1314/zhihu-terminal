@@ -108,7 +108,7 @@ class ArticleSpider(SpiderBaseclass):
             'sort_by': 'default',
             'platform': 'desktop',
         }
-        r = await self.client.get(url, params=params, proxy='http://10.10.9.218:8888', ssl=False)
+        r = await self.client.get(url, params=params)
         result = await r.json()
         self.logger.debug(result)
         return result
@@ -121,7 +121,7 @@ class ArticleSpider(SpiderBaseclass):
         :param limit:
         :return:
         """
-        r = await self.client.get(url, proxy='http://10.10.9.218:8888', ssl=False)
+        r = await self.client.get(url)
         result = await r.json()
         self.logger.debug(result)
         return result
