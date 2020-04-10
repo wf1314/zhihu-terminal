@@ -1,13 +1,13 @@
 # zhihu-terminal
 摸鱼神器,命令行版知乎
-灵感来自[duduainankai/zhihu-terminal](https://github.com/duduainankai/zhihu-terminal)
+灵感来自[duduainankai/zhihu-terminal](https://raw.githubusercontent.com/wf1314/static/master/terminal_zhihu_static/zhihu-terminal.jpg)
 
 ## 目前功能
 <img width="800" height="500" src="/static/zhihu-terminal.jpg"/>
 
 
 ## GIF演示
-<img width="500" height="500" src="/static/show1.gif"/>
+<img width="500" height="500" src="https://github.com/wf1314/static/blob/master/terminal_zhihu_static/show1.gif?raw=true"/>
 
 
 ## 项目介绍
