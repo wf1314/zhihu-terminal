@@ -22,6 +22,10 @@ Python 3.7
 
 ## 准备
 
+建议拉取时仅拉取最近一次提交,历史提交中存在一个比较大的动图拉取时间会较长
+```
+git clone --depth 1 git@github.com:wf1314/zhihu-terminal.git
+```
 安装Python 3.7的环境后执行
 ```
 pip install -r requirements.txt
