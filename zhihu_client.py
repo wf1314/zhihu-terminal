@@ -83,7 +83,7 @@ class ZhihuClient(aiohttp.ClientSession):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
                           '(KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586',
             'content-type': 'application/x-www-form-urlencoded',
-            'x-zse-83': '3_1.1',
+            'x-zse-83': '3_2.0',
             'x-xsrftoken': xsrf
         }
         data = self._encrypt(login_data)
@@ -190,7 +190,7 @@ class ZhihuClient(aiohttp.ClientSession):
     def _encrypt(form_data: dict) -> str:
         with open(f'./static/encrypt.js') as f:
             js = execjs.compile(f.read())
-            return js.call('Q', urlencode(form_data))
+            return js.call('b', urlencode(form_data))
 
 
 if __name__ == '__main__':
