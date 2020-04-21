@@ -49,7 +49,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 },
                 'excerpt': target.get('excerpt_new') or target.get('excerpt'),
                 'content': target['content'],
-                'voteup_count': target['voteup_count'],  # 赞同数
+                'voteup_count': target.get('voteup_count'),  # 赞同数
                 'visited_count': target.get('visited_count'),
                 'thanks_count': target.get('thanks_count', 0),
                 'comment_count': target['comment_count'],
@@ -58,6 +58,9 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 'created_time': d['created_time'],
                 'updated_time': d['updated_time'],
             }
+            # 如果type是zvideo，那么voteup_count对应的属性名是vote_count,这里把属性名修改过来
+            if target['type'] == 'zvideo':
+                article_info['voteup_count'] = target.get('vote_count')
             if question:
                 question = {
                     'author': {
@@ -75,7 +78,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
             else:
                 question = {
                     'title': target['title'],
-                    'url': target['url'],
+                    'url': target.get('url'),
                     'type': 'market',
                     'id': '',
                     'author': target['author']
