@@ -89,6 +89,7 @@ def print_article_content(output: dict):
     print_colour(f'|article_id:{output["id"]}', 'purple')
     print_colour(f'|question_id:{question_id}', 'purple')
     print_colour(f'|title:{title}', 'purple')
+    print_colour(f'|原文链接:https://www.zhihu.com/question/{question_id}/answer/{output["id"]}', 'purple')
     print_colour('-----------------------------------------------------', 'purple')
 
 
