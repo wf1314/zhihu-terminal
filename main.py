@@ -405,6 +405,9 @@ async def login(user, password):
     if os.path.exists(client.cookie_file):
         # 如果cookie缓存存在优先读取缓存
         load_cookies = True
+    if not load_cookies and (not USER or not PASSWORD):
+        print_colour('请正确配置USER, PASSWORD', 'red')
+        sys.exit()
     await client.login(load_cookies=load_cookies)
     return client
 

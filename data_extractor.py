@@ -39,6 +39,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
             target = d['target']
             author = target['author']
             question = target.get('question')
+            playlist = target.get('thumbnail_extra_info', {}).get('playlist')
             article_info = {
                 'author': {  # 作者信息
                     'name': author['name'],
@@ -49,7 +50,7 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 },
                 'excerpt': target.get('excerpt_new') or target.get('excerpt'),
                 'content': target['content'],
-                'voteup_count': target.get('voteup_count'),  # 赞同数
+                'voteup_count': target.get('voteup_count', target.get('vote_count')),  # 赞同数
                 'visited_count': target.get('visited_count'),
                 'thanks_count': target.get('thanks_count', 0),
                 'comment_count': target['comment_count'],
@@ -58,9 +59,11 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 'created_time': d['created_time'],
                 'updated_time': d['updated_time'],
             }
-            # 如果type是zvideo，那么voteup_count对应的属性名是vote_count,这里把属性名修改过来
-            if target['type'] == 'zvideo':
-                article_info['voteup_count'] = target.get('vote_count')
+            # # 如果type是zvideo，那么voteup_count对应的属性名是vote_count,这里把属性名修改过来
+            if target['type'] == 'zvideo' and playlist:
+                article_info['content'] += f'\n{playlist.get("hd", {}).get("url", "")}'
+                article_info['excerpt'] = '**video**'
+            #     article_info['voteup_count'] = target.get('vote_count')
             if question:
                 question = {
                     'author': {

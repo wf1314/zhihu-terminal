@@ -40,6 +40,18 @@ class ZhihuClient(aiohttp.ClientSession):
         self.logger = get_logger()
         self.cookie_file = COOKIE_FILE or '/tmp/cookies.pick'
 
+    def get(self, url,  **kwargs):
+        """Perform HTTP GET request."""
+        return super().get(url, ssl=False,  **kwargs)
+
+    def post(self, url, data=None, **kwargs):
+        """Perform HTTP POST request."""
+        return super().post(url, ssl=False, data=data, **kwargs)
+
+    def put(self, url, data=None, **kwargs):
+        """Perform HTTP PUT request."""
+        return super().put(url, ssl=False, data=data, **kwargs)
+
     async def login(self, load_cookies: bool=False) -> None:
         """
         登录
@@ -65,7 +77,7 @@ class ZhihuClient(aiohttp.ClientSession):
             'username': self.user,
             'password': self.password,
             'lang': 'en',  # en 4位验证码, cn 中文验证码
-            'ref_source': 'homepage',
+            'ref_source': 'other_https://www.zhihu.com/signin?next=%2F',
             'utm_source': ''
         }
         xsrf = await self._get_xsrf()
@@ -106,8 +118,6 @@ class ZhihuClient(aiohttp.ClientSession):
         """
         请求验证码的 API 接口，无论是否需要验证码都需要请求一次
         如果需要验证码会返回图片的 base64 编码
-        根据 lang 参数匹配验证码，需要人工输入
-        :param lang: 返回验证码的语言(en/cn)
         :return: 验证码的 POST 参数
         """
 
@@ -186,9 +196,15 @@ class ZhihuClient(aiohttp.ClientSession):
         ha.update(bytes((grant_type + client_id + source + str(timestamp)), 'utf-8'))
         return ha.hexdigest()
 
+    # @staticmethod
+    # def _encrypt(form_data: dict) -> str:
+    #     with open(f'./static/encrypt_old.js') as f:
+    #         js = execjs.compile(f.read())
+    #         return js.call('Q', urlencode(form_data))
+
     @staticmethod
-    def _encrypt(form_data: dict) -> str:
-        with open(f'./static/encrypt.js') as f:
+    def _encrypt(form_data: dict):
+        with open('./static/encrypt.js') as f:
             js = execjs.compile(f.read())
             return js.call('b', urlencode(form_data))
 
@@ -198,8 +214,7 @@ if __name__ == '__main__':
 
     async def test():
         client = ZhihuClient(user=USER, password=PASSWORD)
-        await client.login(load_cookies=True)
+        await client.login(load_cookies=False)
         await client.close()
 
     asyncio.run(test())
-

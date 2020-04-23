@@ -83,12 +83,21 @@ def print_article_content(output: dict):
     content = output['content']
     title = output['question']['title']
     question_id = output['question']['id']
+    article_id = output["id"]
+    typ = output['type']
+    if typ == 'zvideo':
+        url = f'https://www.zhihu.com/zvideo/{article_id}'
+    elif article_id and not question_id:
+        url = f'https://zhuanlan.zhihu.com/p/{article_id}'
+    else:
+        url = f'https://www.zhihu.com/question/{question_id}/answer/{article_id}'
     content = html2text.html2text(content)
     print_colour(content)
     print_colour('-----------------------------------------------------', 'purple')
-    print_colour(f'|article_id:{output["id"]}', 'purple')
+    print_colour(f'|article_id:{article_id}', 'purple')
     print_colour(f'|question_id:{question_id}', 'purple')
     print_colour(f'|title:{title}', 'purple')
+    print_colour(f'|原文链接:{url}', 'purple')
     print_colour('-----------------------------------------------------', 'purple')
 
 
