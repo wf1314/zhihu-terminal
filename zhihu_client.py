@@ -36,7 +36,7 @@ class ZhihuClient(aiohttp.ClientSession):
             'Referer': 'https://www.zhihu.com/',
             'accept-encoding': 'gzip, deflate',
         }
-        self._default_headers = headers
+        self.headers = headers
         self.logger = get_logger()
         self.cookie_file = COOKIE_FILE or '/tmp/cookies.pick'
 

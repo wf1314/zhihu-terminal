@@ -13,7 +13,7 @@ class UserSpider(SpiderBaseclass):
               'messages_count;draft_count;following_question_count;account_status,is_bind_phone,' \
               'is_force_renamed,email,renamed_fullname;ad_type'
 
-        async with self.client.get(url) as resp:
+        async with self.client.get(url, headers = self.client.headers) as resp:
             result = await resp.json()
             self.logger.debug(result)
         return result
