@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+/captcha.jpg
 # Distribution / packaging
 .Python
 build/
@@ -106,3 +106,16 @@ venv.bak/
 /static/cookies.pick
 .idea/
 cookies.pick
+
+# .vscode/
+/.vscode/
+
+# node_modules/
+/node_modules/
+
+# setting.py
+/setting.py
+
+/*.ipynb
+
+/*.txt
