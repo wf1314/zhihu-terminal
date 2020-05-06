@@ -290,6 +290,7 @@ async def deal_question(spider, question_id, uid):
                 continue
             url = paging['next']
             question_articles, paging = await spider.get_article_by_question_url(url)
+            ids = [d.get('id') for d in question_articles]
             print_recommend_article(question_articles)
             continue
         elif ques_cmd[0] == 'p':
@@ -298,6 +299,7 @@ async def deal_question(spider, question_id, uid):
                 continue
             url = paging['previous']
             question_articles, paging = await spider.get_article_by_question_url(url)
+            ids = [d.get('id') for d in question_articles]
             print_recommend_article(question_articles)
         elif ques_cmd[0] == 'r':
             print_recommend_article(question_articles)
