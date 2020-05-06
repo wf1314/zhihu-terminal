@@ -104,7 +104,12 @@ class DataExtractor(ArticleSpider, CommentSpider, UserSpider):
                 clild['author'] = clild['author']['member']
                 if clild['reply_to_author'].get('member'):
                     clild['reply_to_author'] = clild['reply_to_author']['member']
-            reply_to_author = d.get('reply_to_author', {}).get('member', {})
+            # reply_to_author = d.get('reply_to_author', {}).get('member', {})
+            if not d.get('reply_to_author', {}):
+                reply_to_author = {}
+            else:
+                reply_to_author = d.get('reply_to_author', {}).get('member', {})
+
             comment_info = {
                 'author': {
                     'name': author.get('name'),

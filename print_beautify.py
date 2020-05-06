@@ -117,6 +117,7 @@ def print_question(question: dict):
     print_colour(question_content)
     print_colour('*' * 50, 'purple')
 
+
 def print_comments(output: list):
     """
     打印评论
