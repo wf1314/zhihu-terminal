@@ -1,5 +1,5 @@
 # zhihu-terminal
-摸鱼神器,命令行版知乎
+命令行版知乎
 灵感来自[duduainankai/zhihu-terminal](https://github.com/duduainankai/zhihu-terminal)
 
 ## 目前功能
